@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://brcv2f4nk5ydo"]
 
-[ext_resource type="Script" uid="uid://d0isfts2ufh0r" path="res://contractSceneController.gd" id="1_pknjm"]
+[ext_resource type="Script" uid="uid://0ufbw4vnufcf" path="res://scripts/scene_controllers/contractSceneController.gd" id="2_olct7"]
 [ext_resource type="Theme" uid="uid://bp5vfv8jgvon8" path="res://maps/contract_them.tres" id="2_rjc21"]
 
 [node name="Contract" type="Panel"]
@@ -18,10 +18,10 @@ offset_bottom = 1071.0
 grow_horizontal = 2
 grow_vertical = 2
 theme = ExtResource("2_rjc21")
-script = ExtResource("1_pknjm")
+script = ExtResource("2_olct7")
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
-layout_mode = 2
+layout_mode = 0
 offset_left = 173.0
 offset_top = 30.0
 offset_right = 1146.0

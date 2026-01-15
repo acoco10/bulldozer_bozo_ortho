@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://dg6yxh18lhgvb"]
 
-[ext_resource type="Script" uid="uid://bntms0noqoxwp" path="res://apartment_scene_controller.gd" id="1_yohrq"]
+[ext_resource type="Script" uid="uid://cubqn0ypvp2m6" path="res://scripts/scene_controllers/apartment_scene_controller.gd" id="1_yohrq"]
 [ext_resource type="Texture2D" uid="uid://cvhfnr632u4ns" path="res://art/shittyApartmentBackground.png" id="2_yohrq"]
 
 [node name="apartment_scene" type="Node2D"]
@@ -37,7 +37,7 @@ grow_vertical = 2
 metadata/_edit_use_anchors_ = true
 
 [node name="MarginContainer" type="MarginContainer" parent="Contract"]
-layout_mode = 2
+layout_mode = 0
 offset_left = 173.0
 offset_top = 30.0
 offset_right = 1146.0

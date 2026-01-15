@@ -110,7 +110,6 @@ func trigger_push_fail(directionFlag: DirectionalCharacter.Facing):
 
 func update_animation(state: Facing):
 	var animation_name: String
-	update_backhoe(state)
 
 	if state == Facing.UP:
 		animation_name = "up"
@@ -165,18 +164,6 @@ func _unhandled_input(event):
 	if dir != Vector2i.ZERO:
 		if try_move(dir, now_facing, player_facing):
 			turns +=1 
-			if now_facing == player_facing:
-				push_strength +=1 
-				if !$boost.visible:
-					$boost.visible = true 
-				elif !$boost2.visible:
-					$boost2.visible = true 
-				elif !$boost3.visible:
-					$boost3.visible = true 
-			else:
-				$boost.visible = false 
-				$boost2.visible = false 
-				$boost3.visible = false 
 			player_facing = now_facing
 		tracker.take_turn()
 	

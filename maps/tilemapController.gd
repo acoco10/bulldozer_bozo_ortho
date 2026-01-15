@@ -35,9 +35,9 @@ func _on_fence_hit(data):
 func _on_debris_broken_up():
 	for debris in get_tree().get_nodes_in_group("debris"):
 		debris = debris as Entity
-		if !debris.HitFence.is_connected():
+		if !debris.HitFence.is_connected(_on_fence_hit):
 			debris.HitFence.connect(_on_fence_hit)
-			if !debris.DebrisBrokenUp.is_connected():
+			if !debris.DebrisBrokenUp.is_connected(_on_debris_broken_up):
 				debris.DebrisBrokenUp.connect(_on_debris_broken_up)
 
 	

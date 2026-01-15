@@ -19,7 +19,6 @@ var is_moving: bool = false
 var animated_effect: String
 # Exports
 @export var shape_type: ShapeType = ShapeType.SINGLE
-@export var Group: String
 @export var tilemap_fences_layer: TileMapLayer 
 @export var tilemap: TileMapLayer
 @export var texture_path_name: String
@@ -38,8 +37,7 @@ signal HitFence
 
 
 func _ready() -> void:
-	if Group:
-		add_to_group(Group)
+	add_to_group("debris")
 	grid_pos = tilemap.local_to_map(position)
 	initialize_shape(shape_type)
 	
