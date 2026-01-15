@@ -1,0 +1,11 @@
+[gd_resource type="Theme" load_steps=2 format=3 uid="uid://d3777wnxr81vv"]
+
+[ext_resource type="FontFile" uid="uid://bqkypnl1mwuqp" path="res://PixelOperator.ttf" id="1_bqwt3"]
+
+[resource]
+default_base_scale = 1.0
+default_font = ExtResource("1_bqwt3")
+default_font_size = 52
+RichTextLabel/constants/outline_size = 5
+RichTextLabel/font_sizes/normal_font_size = 52
+RichTextLabel/fonts/normal_font = ExtResource("1_bqwt3")

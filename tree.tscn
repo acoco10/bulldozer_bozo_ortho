@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3 uid="uid://c0wdauhw1f5a6"]
+
+[ext_resource type="Script" uid="uid://dftnme8a8ts5q" path="res://entity.gd" id="1_nnvrw"]
+[ext_resource type="Texture2D" uid="uid://b55fbsly25wd2" path="res://art/tree.png" id="2_gvmkm"]
+
+[node name="Tree" type="Node2D"]
+visible = false
+y_sort_enabled = true
+script = ExtResource("1_nnvrw")
+shape_type = 1
+Group = "debris"
+texture_path_name = "tree"
+split = false
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(0, -32)
+texture = ExtResource("2_gvmkm")

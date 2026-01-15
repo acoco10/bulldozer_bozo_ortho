@@ -1,0 +1,73 @@
+[gd_scene load_steps=3 format=3 uid="uid://brcv2f4nk5ydo"]
+
+[ext_resource type="Script" uid="uid://d0isfts2ufh0r" path="res://contractSceneController.gd" id="1_pknjm"]
+[ext_resource type="Theme" uid="uid://bp5vfv8jgvon8" path="res://maps/contract_them.tres" id="2_rjc21"]
+
+[node name="Contract" type="Panel"]
+z_index = -1
+custom_minimum_size = Vector2(1200, 1200)
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -576.0
+offset_top = -324.0
+offset_right = 762.0
+offset_bottom = 1071.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_rjc21")
+script = ExtResource("1_pknjm")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+offset_left = 173.0
+offset_top = 30.0
+offset_right = 1146.0
+offset_bottom = 1298.0
+theme = ExtResource("2_rjc21")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+custom_minimum_size = Vector2(600, 400)
+layout_mode = 2
+theme = ExtResource("2_rjc21")
+
+[node name="Title" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Contract 1: Data center monstrososity"
+horizontal_alignment = 1
+
+[node name="Requirments" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Requirements:"
+
+[node name="RequirementsText" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Clean up all debris
+"
+vertical_alignment = 1
+
+[node name="RequirementsText2" type="Label" parent="MarginContainer/VBoxContainer"]
+visible = false
+layout_mode = 2
+theme_override_constants/paragraph_spacing = 0
+theme_override_font_sizes/font_size = 80
+text = "Bonuses:
+"
+vertical_alignment = 1
+
+[node name="a_rank" type="Label" parent="MarginContainer/VBoxContainer"]
+visible = false
+layout_mode = 2
+text = "A Rank: "
+
+[node name="b_rank" type="Label" parent="MarginContainer/VBoxContainer"]
+visible = false
+layout_mode = 2
+text = "B Rank: "
+
+[node name="c_rank" type="Label" parent="MarginContainer/VBoxContainer"]
+visible = false
+layout_mode = 2
+text = "C Rank: "

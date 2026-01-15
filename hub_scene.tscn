@@ -1,0 +1,58 @@
+[gd_scene load_steps=10 format=3 uid="uid://bj4exhrrgl0yw"]
+
+[ext_resource type="Script" uid="uid://dth1hgsbsnr3i" path="res://hub_scene.gd" id="1_8crxj"]
+[ext_resource type="PackedScene" uid="uid://brcv2f4nk5ydo" path="res://contract_screen.tscn" id="1_m4mjg"]
+[ext_resource type="PackedScene" uid="uid://dg6yxh18lhgvb" path="res://apartment_screen.tscn" id="2_8crxj"]
+[ext_resource type="Script" uid="uid://cca3f713mdrf" path="res://canvas_layer.gd" id="2_bylfj"]
+[ext_resource type="Shader" uid="uid://by47ysoslr2p2" path="res://shaders/screen_wipe.gdshader" id="3_551ry"]
+[ext_resource type="PackedScene" uid="uid://cxfcykben3ydb" path="res://dozer.tscn" id="6_x1i88"]
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_551ry"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_x1i88"]
+bg_color = Color(0.9217, 0.858743, 0.811477, 1)
+border_width_left = 10
+border_width_top = 10
+border_width_right = 10
+border_width_bottom = 10
+border_color = Color(0.601159, 0.398105, 0.193009, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_x1i88"]
+shader = ExtResource("3_551ry")
+shader_parameter/progress = 0.0
+shader_parameter/direction = 0
+shader_parameter/color = Color(0, 0, 0, 1)
+
+[node name="HubScene" type="Node2D"]
+script = ExtResource("1_8crxj")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+script = ExtResource("2_bylfj")
+
+[node name="apartment_scene" parent="CanvasLayer" instance=ExtResource("2_8crxj")]
+visible = false
+
+[node name="Contract" parent="CanvasLayer" instance=ExtResource("1_m4mjg")]
+material = SubResource("CanvasItemMaterial_551ry")
+anchors_preset = 5
+anchor_top = 0.0
+anchor_bottom = 0.0
+offset_left = -669.0
+offset_top = 122.0
+offset_right = 669.0
+offset_bottom = 1517.0
+grow_vertical = 1
+theme_override_styles/panel = SubResource("StyleBoxFlat_x1i88")
+
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer"]
+material = SubResource("ShaderMaterial_x1i88")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -40.0
+offset_bottom = -40.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="dozer" parent="." instance=ExtResource("6_x1i88")]

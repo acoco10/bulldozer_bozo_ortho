@@ -1,0 +1,88 @@
+[gd_scene load_steps=6 format=3 uid="uid://cxfcykben3ydb"]
+
+[ext_resource type="Script" uid="uid://cnyyvu5iojw8t" path="res://gametracker.gd" id="1_a8en6"]
+[ext_resource type="Script" uid="uid://eepcanbg11db" path="res://dozerSceneController.gd" id="1_fkasi"]
+[ext_resource type="PackedScene" uid="uid://dhhpw4xkk7nlw" path="res://tile_based_directional_character.tscn" id="3_kchhy"]
+[ext_resource type="Script" uid="uid://bj6geci6p4ujl" path="res://label_2.gd" id="7_iif84"]
+[ext_resource type="Script" uid="uid://h5lm2rehiltw" path="res://timer.gd" id="9_k4dr0"]
+
+[node name="dozer" type="Node2D"]
+script = ExtResource("1_fkasi")
+
+[node name="gametracker" type="Node2D" parent="." node_paths=PackedStringArray("timeTracker", "TrackerLabel", "ClearedDebris", "ContractCompleted", "QuittingTime")]
+position = Vector2(1, 0)
+script = ExtResource("1_a8en6")
+timeTracker = NodePath("../timer")
+TrackerLabel = NodePath("../CanvasLayer/tracker_text")
+ClearedDebris = NodePath("../CanvasLayer/debris_cleared_graphic")
+ContractCompleted = NodePath("../CanvasLayer/Contract Completed")
+QuittingTime = NodePath("../CanvasLayer/quittingTime")
+
+[node name="Player" parent="." node_paths=PackedStringArray("tracker") instance=ExtResource("3_kchhy")]
+z_index = 1
+y_sort_enabled = true
+position = Vector2(862, 605)
+tracker = NodePath("../gametracker")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="quittingTime" type="Label" parent="CanvasLayer"]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -284.0
+offset_top = -27.5
+offset_right = 284.0
+offset_bottom = 27.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 100
+text = "\"Engine off, its quitting time!\""
+
+[node name="Contract Completed" type="Label" parent="CanvasLayer"]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -499.0
+offset_top = -68.5
+offset_right = 499.0
+offset_bottom = 68.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 100
+text = "Contract Completed!"
+
+[node name="debris_cleared_graphic" type="Label" parent="CanvasLayer"]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -283.0
+offset_top = -68.5
+offset_right = 283.0
+offset_bottom = 68.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/outline_size = 2
+theme_override_font_sizes/font_size = 100
+text = "Debris Cleared!"
+script = ExtResource("7_iif84")
+
+[node name="tracker_text" type="Label" parent="CanvasLayer"]
+offset_left = 13.0
+offset_top = 11.0
+offset_right = 53.0
+offset_bottom = 66.0
+theme_override_font_sizes/font_size = 40
+
+[node name="timer" type="Node2D" parent="."]
+script = ExtResource("9_k4dr0")
+metadata/_edit_group_ = true

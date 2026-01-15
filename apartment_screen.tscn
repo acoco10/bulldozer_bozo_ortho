@@ -1,0 +1,74 @@
+[gd_scene load_steps=3 format=3 uid="uid://dg6yxh18lhgvb"]
+
+[ext_resource type="Script" uid="uid://bntms0noqoxwp" path="res://apartment_scene_controller.gd" id="1_yohrq"]
+[ext_resource type="Texture2D" uid="uid://cvhfnr632u4ns" path="res://art/shittyApartmentBackground.png" id="2_yohrq"]
+
+[node name="apartment_scene" type="Node2D"]
+position = Vector2(301, 186)
+script = ExtResource("1_yohrq")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -301.0
+offset_top = -186.0
+offset_right = 2699.0
+offset_bottom = 1814.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.066755, 0.066755, 0.066755, 1)
+metadata/_edit_use_anchors_ = true
+
+[node name="Contract" type="Panel" parent="."]
+z_index = 2
+custom_minimum_size = Vector2(1200, 1200)
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 790.0
+offset_top = 293.0
+offset_right = 2128.0
+offset_bottom = 1688.0
+grow_horizontal = 2
+grow_vertical = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="MarginContainer" type="MarginContainer" parent="Contract"]
+layout_mode = 2
+offset_left = 173.0
+offset_top = 30.0
+offset_right = 1146.0
+offset_bottom = 1298.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Contract/MarginContainer"]
+custom_minimum_size = Vector2(600, 400)
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Contract/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 100
+text = "End of Day 1"
+horizontal_alignment = 1
+
+[node name="Conditions" type="Label" parent="Contract/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/paragraph_spacing = 0
+theme_override_font_sizes/font_size = 80
+text = "
+
+	Child Support: $5
+	Rent: $10
+	Beer: $0
+	Savings: $10
+	
+
+Next Day (enter)"
+vertical_alignment = 1
+
+[node name="ShittyApartmentBackground" type="Sprite2D" parent="."]
+position = Vector2(1114, 939)
+scale = Vector2(4, 4)
+texture = ExtResource("2_yohrq")
