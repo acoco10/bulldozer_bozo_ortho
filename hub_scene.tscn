@@ -1,10 +1,11 @@
-[gd_scene load_steps=10 format=3 uid="uid://bj4exhrrgl0yw"]
+[gd_scene load_steps=11 format=3 uid="uid://bj4exhrrgl0yw"]
 
-[ext_resource type="Script" uid="uid://dth1hgsbsnr3i" path="res://hub_scene.gd" id="1_8crxj"]
 [ext_resource type="PackedScene" uid="uid://brcv2f4nk5ydo" path="res://contract_screen.tscn" id="1_m4mjg"]
+[ext_resource type="Script" uid="uid://bgi8ofk5e5ml5" path="res://scripts/hub_scene.gd" id="1_x1i88"]
 [ext_resource type="PackedScene" uid="uid://dg6yxh18lhgvb" path="res://apartment_screen.tscn" id="2_8crxj"]
-[ext_resource type="Script" uid="uid://cca3f713mdrf" path="res://canvas_layer.gd" id="2_bylfj"]
+[ext_resource type="Script" uid="uid://445djhrddy20" path="res://scripts/screen_transition_canvas_layer.gd" id="2_rcx7m"]
 [ext_resource type="Shader" uid="uid://by47ysoslr2p2" path="res://shaders/screen_wipe.gdshader" id="3_551ry"]
+[ext_resource type="Script" uid="uid://0ufbw4vnufcf" path="res://scripts/contractSceneController.gd" id="5_rcx7m"]
 [ext_resource type="PackedScene" uid="uid://cxfcykben3ydb" path="res://dozer.tscn" id="6_x1i88"]
 
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_551ry"]
@@ -24,10 +25,10 @@ shader_parameter/direction = 0
 shader_parameter/color = Color(0, 0, 0, 1)
 
 [node name="HubScene" type="Node2D"]
-script = ExtResource("1_8crxj")
+script = ExtResource("1_x1i88")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
-script = ExtResource("2_bylfj")
+script = ExtResource("2_rcx7m")
 
 [node name="apartment_scene" parent="CanvasLayer" instance=ExtResource("2_8crxj")]
 visible = false
@@ -43,6 +44,7 @@ offset_right = 669.0
 offset_bottom = 1517.0
 grow_vertical = 1
 theme_override_styles/panel = SubResource("StyleBoxFlat_x1i88")
+script = ExtResource("5_rcx7m")
 
 [node name="ColorRect" type="ColorRect" parent="CanvasLayer"]
 material = SubResource("ShaderMaterial_x1i88")

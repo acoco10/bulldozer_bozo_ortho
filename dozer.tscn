@@ -1,17 +1,17 @@
 [gd_scene load_steps=6 format=3 uid="uid://cxfcykben3ydb"]
 
-[ext_resource type="Script" uid="uid://cnyyvu5iojw8t" path="res://gametracker.gd" id="1_a8en6"]
-[ext_resource type="Script" uid="uid://eepcanbg11db" path="res://dozerSceneController.gd" id="1_fkasi"]
+[ext_resource type="Script" path="res://dozerSceneController.gd" id="1_fkasi"]
+[ext_resource type="Script" uid="uid://c5i110do03bh1" path="res://scripts/gametracker.gd" id="2_82cqt"]
 [ext_resource type="PackedScene" uid="uid://dhhpw4xkk7nlw" path="res://tile_based_directional_character.tscn" id="3_kchhy"]
-[ext_resource type="Script" uid="uid://bj6geci6p4ujl" path="res://label_2.gd" id="7_iif84"]
-[ext_resource type="Script" uid="uid://h5lm2rehiltw" path="res://timer.gd" id="9_k4dr0"]
+[ext_resource type="Script" uid="uid://vav2f3uvehac" path="res://scripts/timer.gd" id="5_82cqt"]
+[ext_resource type="Script" path="res://label_2.gd" id="7_iif84"]
 
 [node name="dozer" type="Node2D"]
 script = ExtResource("1_fkasi")
 
 [node name="gametracker" type="Node2D" parent="." node_paths=PackedStringArray("timeTracker", "TrackerLabel", "ClearedDebris", "ContractCompleted", "QuittingTime")]
 position = Vector2(1, 0)
-script = ExtResource("1_a8en6")
+script = ExtResource("2_82cqt")
 timeTracker = NodePath("../timer")
 TrackerLabel = NodePath("../CanvasLayer/tracker_text")
 ClearedDebris = NodePath("../CanvasLayer/debris_cleared_graphic")
@@ -84,5 +84,5 @@ offset_bottom = 66.0
 theme_override_font_sizes/font_size = 40
 
 [node name="timer" type="Node2D" parent="."]
-script = ExtResource("9_k4dr0")
+script = ExtResource("5_82cqt")
 metadata/_edit_group_ = true
