@@ -1,5 +1,6 @@
 class_name gameTracker
 extends Node2D
+
 var cleanedDebris: int
 var debris_queue: Array = []
 var is_showing_label: bool = false
@@ -8,12 +9,15 @@ var current_contract: int = 1
 var current_contract_finished: bool 
 var Day: int = 1 
 var debris_in_contract
- 
-var maps: Array
+
+var maps: Array 
 var map_index: int = 0
 var current_map: TileMapLayer
 var current_map_node: map
 var current_fences_map: TileMapLayer
+
+var best_turns: int = 0 
+var turns: int = 1 
 
 
 @export var timeTracker: timer
@@ -61,7 +65,8 @@ func load_cur_map():
 		else:
 			n_uncleared_debris +=1
 
-
+	best_turns = load_best_score(current_map_node.name)
+	
 func leave_scene():
 	ContractCompleted.visible = false 
 	QuittingTime.visible = false 
@@ -83,6 +88,7 @@ func _on_debris_cleaned():
 	
 		
 func take_turn() -> bool: 
+	turns += 1 
 	update_text(Day, current_contract, cleanedDebris, timeTracker.get_time_string())
 	if timeTracker.advance_time():
 		QuittingTime.visible = true
@@ -93,6 +99,8 @@ func take_turn() -> bool:
 func _process_debris_queue():
 	if debris_queue.is_empty():
 		if cleanedDebris == n_uncleared_debris and !current_contract_finished: 
+			if turns < best_turns || best_turns == -1:
+				save_best_score(current_map_node.name, turns)
 			QuittingTime.text = "Looks like you finished the contract, call it a day and get out of here"
 			QuittingTime.visible = true
 			current_contract_finished = true 
@@ -134,4 +142,27 @@ func _unhandled_input(event: InputEvent) -> void:
 			get_tree().reload_current_scene()
 			
 func update_text(current_day: int, current_contract: int, n_debris_cleaned: int, timestring: String) -> void:
-	TrackerLabel.text = "Day %d\nTraining Gig:%d\nDebris Cleaned: %d/%d\n %s" %[current_day, current_contract, n_debris_cleaned, n_uncleared_debris, timestring]
+	TrackerLabel.text = "Day %d\nTraining Gig:%d\nDebris Cleaned: %d/%d\n Current Turns: %d\n Best Turns: %d\n" %[current_day, current_contract, n_debris_cleaned, n_uncleared_debris, turns, best_turns]
+	
+func save_best_score(level_name: String, turns: int):
+	var config = ConfigFile.new()
+	var save_path = "user://level_scores.cfg"
+
+	# Load existing data if file exists
+	config.load(save_path)
+
+	# Only save if it's better than existing score (or first time)
+	var current_best = config.get_value(level_name, "best_turns", INF)
+	if turns < current_best:
+		config.set_value(level_name, "best_turns", turns)
+		config.save(save_path)
+
+# Load the best score
+func load_best_score(level_name: String) -> int:
+	var config = ConfigFile.new()
+	var err = config.load("user://level_scores.cfg")
+
+	if err != OK:
+		return -1  # No save file yet
+
+	return config.get_value(level_name, "best_turns", -1)

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dto10oalnmb3s"
-path="res://.godot/imported/orthoTiles.png-4b329516ca7872731cba866b64ffb1b2.ctex"
+uid="uid://b1uc1xhbjg6q"
+path="res://.godot/imported/backhoeup.png-e248626498b7dbf87dfafa83dc5bd150.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://art/orthoTiles.png"
-dest_files=["res://.godot/imported/orthoTiles.png-4b329516ca7872731cba866b64ffb1b2.ctex"]
+source_file="res://art/backhoeup.png"
+dest_files=["res://.godot/imported/backhoeup.png-e248626498b7dbf87dfafa83dc5bd150.ctex"]
 
 [params]
 

@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=4 uid="uid://5uiw6glydwq7"]
+[gd_scene load_steps=7 format=4 uid="uid://5uiw6glydwq7"]
 
 [ext_resource type="TileSet" uid="uid://bydf6q7xrag3d" path="res://dozer.tres" id="1_st3ta"]
 [ext_resource type="Script" uid="uid://uhiewv2g8r22" path="res://maps/map.gd" id="1_xjrid"]
@@ -6,7 +6,6 @@
 [ext_resource type="Script" uid="uid://caqtkk0crqjgn" path="res://maps/tiles.gd" id="2_qumfa"]
 [ext_resource type="Texture2D" uid="uid://dfl5xtwntv5e3" path="res://art/truckLayer2.png" id="3_qumfa"]
 [ext_resource type="PackedScene" uid="uid://cscul4aciwrgd" path="res://debrisBig.tscn" id="4_xjrid"]
-[ext_resource type="PackedScene" uid="uid://c0wdauhw1f5a6" path="res://tree.tscn" id="5_kccvk"]
 
 [node name="map" type="Node2D" node_paths=PackedStringArray("Player_start_pos")]
 script = ExtResource("1_xjrid")
@@ -16,6 +15,7 @@ Player_start_pos = NodePath("Marker2D")
 metadata/_edit_lock_ = true
 
 [node name="visualFences" type="TileMapLayer" parent="tilemap"]
+z_index = 2
 tile_map_data = PackedByteArray("AAD+/wcAAAABAAMAAQD+/wYAAAAAAAIAAQD+/wAAAAAAAAIAAQD+/wEAAAAAAAIAAQD+/wIAAAAAAAIAAQD+/wMAAAAAAAIAAQD+/wQAAAAAAAIAAQD+/wUAAAAAAAIAAQD//wcAAAABAAEAAAAAAAcAAAABAAEAAAABAAcAAAABAAEAAAACAAcAAAABAAEAAAADAAcAAAABAAEAAAAEAAcAAAABAAEAAAAFAAcAAAABAAEAAAAGAAcAAAABAAEAAAAHAAcAAAABAAEAAAAIAAcAAAABAAEAAAAJAAcAAAABAAEAAAAKAAcAAAABAAEAAAALAAcAAAABAAEAAAAMAAcAAAABAAEAAAANAAcAAAABAAEAAAAOAAcAAAABAAEAAAAPAAcAAAABAAEAAAAQAAcAAAABAAMAAAAQAAYAAAAAAAIAAAAQAAUAAAAAAAIAAAAQAAQAAAAAAAIAAAAQAAMAAAAAAAIAAAAQAAIAAAAAAAIAAAAQAAEAAAAAAAIAAAAQAAAAAAAAAAIAAAA=")
 tile_set = ExtResource("1_st3ta")
 
@@ -65,16 +65,6 @@ tilemap = NodePath("../../tilemap/tiles")
 
 [node name="debris7" parent="interactables" node_paths=PackedStringArray("tilemap") instance=ExtResource("4_xjrid")]
 position = Vector2(739, 351)
-tilemap = NodePath("../../tilemap/tiles")
-
-[node name="Tree" parent="interactables" node_paths=PackedStringArray("tilemap") instance=ExtResource("5_kccvk")]
-visible = true
-position = Vector2(411, 230)
-tilemap = NodePath("../../tilemap/tiles")
-
-[node name="Tree2" parent="interactables" node_paths=PackedStringArray("tilemap") instance=ExtResource("5_kccvk")]
-visible = true
-position = Vector2(798, 356)
 tilemap = NodePath("../../tilemap/tiles")
 
 [node name="Marker2D" type="Marker2D" parent="."]

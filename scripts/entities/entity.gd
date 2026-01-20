@@ -31,6 +31,8 @@ var unbroken_texture: Texture
 var move_speed = 10
 var free_after_move: bool 
 
+var last_turn_result: DebrisAction
+
 signal DebrisCleaned
 signal DebrisBrokenUp
 signal HitFence 
@@ -45,6 +47,7 @@ func _ready() -> void:
 	var broken_asset_path = "res://art/" + texture_path_name + "_broken_up" + ".png"
 	unbroken_texture = load(unbroken_asset_path)
 	broken_up_texture = load(broken_asset_path)
+	
 	sprite.texture = unbroken_texture
 	visual_pos = tilemap.map_to_local(grid_pos)
 
@@ -263,39 +266,58 @@ func set_broken_flags() -> void:
 	pushable = true
 
 
-func uproot(push_direction: DirectionalCharacter.Facing) -> void:
+func uproot(push_direction: DirectionalCharacter.Facing) -> bool:
 	if shape_type != ShapeType.TREE_STANDING:
-		return
+		return false
 	
-	shape_type = ShapeType.TREE_FALLEN
 	var push_vec = get_push_vector(push_direction)
-	local_positions = [Vector2i.ZERO, push_vec]
+	var temp_local_positions :Array[Vector2i] = [Vector2i.ZERO, push_vec]
+	var targ = grid_pos + push_vec
+	if fence_at(targ):
+		return false 
+	if fence_at(targ +push_vec):
+		return false 
+	var deb1 =  find_debris_at(targ) 
+	var deb2 = find_debris_at(push_vec+targ)
 	
+	if deb1 != null:
+		if deb1.broken and deb1.split:
+			if push_direction == DirectionalCharacter.Facing.UP || push_direction == DirectionalCharacter.Facing.DOWN:
+				deb1.push(DirectionalCharacter.Facing.LEFT)
+			else:
+				deb1.push(DirectionalCharacter.Facing.DOWN)
+		else:
+			return false
+	if deb2 != null:
+		if deb2.broken and deb2.split:
+			if push_direction == DirectionalCharacter.Facing.UP || push_direction == DirectionalCharacter.Facing.DOWN:
+				deb2.push(DirectionalCharacter.Facing.LEFT)
+			else:
+				deb2.push(DirectionalCharacter.Facing.DOWN)
+		else:
+			deb2.bulldoze(push_direction)
+	
+	grid_pos = targ
+	local_positions = temp_local_positions		
+	shape_type = ShapeType.TREE_FALLEN	
 	update_visuals_from_positions()
 	update_position()
-	for position in local_positions:
-		for debris in get_tree().get_nodes_in_group("debris"):
-			if debris == self:
-				pass
-			if position + grid_pos == debris.grid_pos:
-				debris = debris as Entity
-				if debris.broken:
-					debris.push(push_direction)
-				elif debris.split:
-					debris.break_up_debris(push_direction)
+	return true 
 
 
-func bulldoze(push_direction: DirectionalCharacter.Facing) -> void:
+func bulldoze(push_direction: DirectionalCharacter.Facing) -> bool:
 	if broken:
-		return
-	if broken_up_texture:
-		sprite.texture = broken_up_texture
-	set_broken_flags()
+		return false
+	var bulldozed = false
 	if shape_type == ShapeType.TREE_STANDING:
-		uproot(push_direction)
+		bulldozed =  uproot(push_direction)
 	if split:
 		break_up_debris(push_direction)
-
+		bulldozed = true 
+	if bulldozed:
+		set_broken_flags()
+		$Sprite2D.texture = broken_up_texture
+	return bulldozed
 
 # === PUSH SYSTEM ===
 
@@ -321,29 +343,19 @@ func push(push_direction: DirectionalCharacter.Facing) -> bool:
 			print("player cant move because pushed object would resolve to invalid position")
 			return false
 		if fence_at(target_pos):
-			
+			print("push resulted in fence collision")
 			enact_hit_fence(push_direction)
 			return true 
 		
 		# Check entity collisions (without pushing yet)
 		if !can_push_to(target_pos, push_direction):
-			if local_positions.size() > 1:
+			print("cannot push to targ after push has been called, returning false")
+			if shape_type == ShapeType.TREE_FALLEN:
 				return try_pivot(push_direction)
 			return false
 	
-	# === PHASE 2: Execute ===
-	# Handle special tiles (holes, cleanup zones, etc.)
-	var should_destroy = false
-	for world_pos in world_positions:
-		var target_pos = world_pos + push_vec
-		var result = handle_special_tile(target_pos)
-		if result == "destroy":
-			should_destroy = true
-	
-	if should_destroy:
-		return true
-	
 	# Push any debris in the way
+	#only push after confirming all target positions are free 
 	for world_pos in world_positions:
 		var target_pos = world_pos + push_vec
 		push_debris_at(target_pos, push_direction)
@@ -372,13 +384,13 @@ func enact_hit_fence(push_direction: DirectionalCharacter.Facing):
 
 func can_push_to(target: Vector2i, push_direction: DirectionalCharacter.Facing) -> bool:
 	for debris in get_tree().get_nodes_in_group("debris"):
-		if debris == self:
+		if debris == self or !debris.occupies(target):
 			continue
-		if not debris.occupies(target):
-			continue
-		if !debris.broken:
+		
+		# Only split broken debris can be in the way
+		if !debris.broken or !debris.split:
 			return false
-		# Recursively check if that debris can be pushed
+	
 	return true
 
 
@@ -395,36 +407,70 @@ func can_be_pushed(push_direction: DirectionalCharacter.Facing) -> bool:
 	return true
 
 
-func handle_special_tile(target_pos: Vector2i) -> String:
-	var atlas_coords = tilemap.get_cell_atlas_coords(target_pos)
-	
-	# Hole - single tile entities fill it
-	if atlas_coords == Vector2i(3, 0) and local_positions.size() == 1:
-		queue_free()
-		tilemap.set_cell(target_pos, 0, Vector2i(0, 0))
-		print("debris was used to fill hole")
-		return "destroy"
-	
-	# Add more special tiles here:
-	# if atlas_coords == Vector2i(X, Y):
-	#     # water, lava, etc.
-	#     return "destroy" or "bridge" or whatever
-	
-	return "ok"
-
-
 func push_debris_at(target: Vector2i, push_direction: DirectionalCharacter.Facing) -> void:
 	for debris in get_tree().get_nodes_in_group("debris"):
 		if debris == self:
 			continue
 		if not debris.occupies(target):
 			continue
-		if debris.broken and debris.split:
+		
+		if split and broken and debris.broken and debris.split:
+			# Check if there's a chain that ends at an obstacle
+			var chain = get_push_chain(debris, push_direction)
+			
+			if chain.size() > 0:
+				# Last debris in chain would hit obstacle
+				var last = chain[-1]
+				var push_vec = get_push_vector(push_direction)
+				var obstacle_pos = last.grid_pos + push_vec
+				
+				if fence_at(obstacle_pos) or has_solid_debris_at(obstacle_pos, chain):
+					# Recombine last two in chain
+					if chain.size() >= 2:
+						var second_last = chain[-2]
+						print("Recombining end of chain: %v and %v" % [second_last.grid_pos, last.grid_pos])
+						recombine_debris(second_last, last)
+						chain.remove_at(chain.size() - 1) 
+						chain.remove_at(chain.size()-2) # Remove last since it's gone
+					
+					# Push remaining chain
+					for i in range(chain.size() - 1, -1, -1):  # Push from back to front
+						chain[i].push(push_direction)
+					return
+			
+			# No chain or no obstacle - normal push
 			if debris.can_be_pushed(push_direction):
 				debris.push(push_direction)
 			else:
-				recombine_debris(self, debris )
+				# Can't push and no chain = recombine with immediate neighbor
+				recombine_debris(self, debris)
 		
+		elif !split:
+			if debris.can_be_pushed(push_direction):
+				debris.push(push_direction)
+
+
+func get_push_chain(start_debris: Entity, push_direction: DirectionalCharacter.Facing) -> Array[Entity]:
+	var chain: Array[Entity] = [self, start_debris]
+	var push_vec = get_push_vector(push_direction)
+	var current = start_debris
+	
+	while true:
+		var next_pos = current.grid_pos + push_vec
+		var next_debris = find_debris_at(next_pos)
+		
+		if next_debris == null:
+			break  # No more debris in chain
+		if next_debris == self:
+			break  # Don't include pusher
+		if !next_debris.broken or !next_debris.split:
+			break  # Hit solid debris, chain ends
+		
+		chain.append(next_debris)
+		current = next_debris
+	
+	return chain
+
 
 # === COLLISION HELPERS ===
 
@@ -474,6 +520,7 @@ func resolve_entity_interaction_after_broken_up(newly_broken: Entity, target: Ve
 		if not debris.occupies(target):
 			continue
 		if !debris.broken || !debris.split :
+			#if would land on invalid tile push to next tile and recheck interactions
 			target = target + get_push_vector(break_direction)
 			return resolve_entity_interaction_after_broken_up(newly_broken, target, break_direction)
 		if debris.broken:
@@ -482,6 +529,39 @@ func resolve_entity_interaction_after_broken_up(newly_broken: Entity, target: Ve
 			return target
 	return target
 
+func find_debris_at(pos: Vector2i) -> Entity:
+	for debris in get_tree().get_nodes_in_group("debris"):
+		if debris.occupies(pos):
+			return debris
+	return null
+
+
+func has_solid_debris_at(pos: Vector2i, ignore_chain: Array[Entity]) -> bool:
+	for debris in get_tree().get_nodes_in_group("debris"):
+		if debris in ignore_chain or debris == self:
+			continue
+		if debris.occupies(pos):
+			if !debris.broken or !debris.split:
+				return true
+	return false
+
+
+func back_hoe_break_up_debris() -> Entity:
+	#breaks a debris into two in place and returns the copy for backhoe to carry rather than pushing apart
+	set_broken_flags()
+	self.sprite.texture = broken_up_texture
+	
+	var copy = self.duplicate()
+	get_parent().add_child(copy)
+	copy._ready()
+	copy.set_broken_flags()
+	copy.sprite.texture = broken_up_texture
+	
+	update_position()
+	copy.update_position()
+	
+	DebrisBrokenUp.emit()
+	return copy 
 
 func break_up_debris(push_direction: DirectionalCharacter.Facing) -> void:
 	var copy = self.duplicate()
@@ -493,30 +573,30 @@ func break_up_debris(push_direction: DirectionalCharacter.Facing) -> void:
 	var new_pos = Vector2i.ZERO
 	var new_copy_pos = Vector2i.ZERO
 	
+	var after_break_push_direction
+	var after_break_push_direction_copy
+	
 	if push_direction == DirectionalCharacter.Facing.UP or push_direction == DirectionalCharacter.Facing.DOWN:
 		new_pos = grid_pos + Vector2i(-1, 0)
 		new_copy_pos = grid_pos + Vector2i(1, 0)
+		after_break_push_direction = DirectionalCharacter.Facing.LEFT
+		after_break_push_direction_copy = DirectionalCharacter.Facing.RIGHT
 	else:
 		new_pos = grid_pos + Vector2i(0, -1)
 		new_copy_pos = grid_pos + Vector2i(0, 1)
+		after_break_push_direction = DirectionalCharacter.Facing.UP
+		after_break_push_direction_copy = DirectionalCharacter.Facing.DOWN
 	
 
-	new_pos = resolve_entity_interaction_after_broken_up(self, new_pos, push_direction)
-	new_copy_pos = resolve_entity_interaction_after_broken_up(copy, new_copy_pos, push_direction)
+	new_pos = resolve_entity_interaction_after_broken_up(self, new_pos, after_break_push_direction)
+	new_copy_pos = resolve_entity_interaction_after_broken_up(copy, new_copy_pos, after_break_push_direction_copy)
+	
 	if fence_at(new_pos):
 		print("orignal debris hit fence after break apart bulldoze")
-		if push_direction == DirectionalCharacter.Facing.UP or push_direction == DirectionalCharacter.Facing.DOWN:
-			enact_hit_fence(DirectionalCharacter.Facing.LEFT)
-		else:
-			enact_hit_fence(DirectionalCharacter.Facing.UP)
-		new_pos = grid_pos
+		new_pos = grid_pos + get_push_vector(push_direction)
 	if fence_at(new_copy_pos):
-		print("copy debris hit fence after break apart bulldoze")
-		if push_direction == DirectionalCharacter.Facing.UP or push_direction == DirectionalCharacter.Facing.DOWN:
-			enact_hit_fence(DirectionalCharacter.Facing.RIGHT)
-		else:
-			enact_hit_fence(DirectionalCharacter.Facing.DOWN)
-		new_copy_pos = grid_pos 
+		new_copy_pos = grid_pos + get_push_vector(push_direction)
+
 		
 	grid_pos = new_pos
 	copy.grid_pos = new_copy_pos
@@ -529,6 +609,9 @@ func break_up_debris(push_direction: DirectionalCharacter.Facing) -> void:
 
 
 func recombine_debris(existing_debris: Entity, moving_debris: Entity) -> void:
+	if !existing_debris.split or !moving_debris.split:
+		return
+
 	existing_debris.sprite.texture = unbroken_texture
 	existing_debris.broken = false
 	moving_debris.queue_free()

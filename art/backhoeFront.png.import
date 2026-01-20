@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dto10oalnmb3s"
-path="res://.godot/imported/orthoTiles.png-4b329516ca7872731cba866b64ffb1b2.ctex"
+uid="uid://bm3p0a1gphmqf"
+path="res://.godot/imported/backhoeFront.png-0fca5c8b02fb244a9bc3957215a15835.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://art/orthoTiles.png"
-dest_files=["res://.godot/imported/orthoTiles.png-4b329516ca7872731cba866b64ffb1b2.ctex"]
+source_file="res://art/backhoeFront.png"
+dest_files=["res://.godot/imported/backhoeFront.png-0fca5c8b02fb244a9bc3957215a15835.ctex"]
 
 [params]
 

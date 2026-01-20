@@ -7,21 +7,22 @@ var visual_pos: Vector2
 var move_speed: float = 10.0
 var is_moving: bool = false
 var turns: int 
-var player_facing: Facing = Facing.LEFT
+var player_facing: Facing = Facing.RIGHT
+var visual_facing: Facing = Facing.RIGHT
 var pushing: bool
 var muddy: bool 
 var invalid_push: bool 
 var push_fail_tween: Tween = null
 var push_strength: int 
-
+var reverse: bool 
+var scooped_debris: bool 
+var last_animation
 
 enum Facing { UP, DOWN, LEFT, RIGHT }
 
 @export var sprite: AnimatedSprite2D
 @export var tracker: gameTracker
 @export var times_up: bool 
-
-@onready var backHoeSprite = $Sprite2D
 
 var tilemap: TileMapLayer
 
@@ -56,7 +57,7 @@ func _process(delta):
 	# Visual smoothly catches up to logical position
 	var target = tilemap.map_to_local(grid_pos)
 	if pushing:
-		visual_pos = visual_pos.move_toward(target, 1* delta * 60)
+		visual_pos = visual_pos.move_toward(target, 5* delta * 60)
 		var strain = sin(Time.get_ticks_msec() * 0.03) * 2.0
 		strain += randf_range(-1.5, 1.5)
 		rotation_degrees = strain
@@ -67,20 +68,7 @@ func _process(delta):
 	is_moving = visual_pos.distance_to(target) > 1.0
 	if !is_moving and pushing:
 		pushing = false 
-	if !is_moving:
-		#check if after turn resolution player got mudded on 
-		#not a good way to have stable turn resolution 
-		for debris in get_tree().get_nodes_in_group("debris"):
-			if debris.grid_pos == grid_pos:
-				print("player on same tile as debris after move completed ")
-				debris = debris as Entity
-				#kinda bad, not sure what I want to do the in this scenario with the game 
-				#so its fine for making it not stall progress here 
-				tracker.cleanedDebris += 1 
-				debris.set_free_after_move()
-				muddy =  true 
-	update_animation(player_facing)
-		
+	
 
 func trigger_push_fail(directionFlag: DirectionalCharacter.Facing):
 	
@@ -110,7 +98,9 @@ func trigger_push_fail(directionFlag: DirectionalCharacter.Facing):
 
 func update_animation(state: Facing):
 	var animation_name: String
-
+	if has_node("backhoeSprites"):
+		$backhoeSprites.update_backhoe(grid_pos, visual_facing, player_facing)
+	
 	if state == Facing.UP:
 		animation_name = "up"
 	elif state == Facing.DOWN:
@@ -119,23 +109,13 @@ func update_animation(state: Facing):
 		animation_name = "left"
 	elif state == Facing.RIGHT:
 		animation_name = "right"
-	
 	if muddy:
 		animation_name += "_mud"
 	
 	self.animation = animation_name
 
-func update_backhoe(state: Facing):
-	if state == Facing.LEFT:
-		if animation != "left":
-			backHoeSprite.flip_h = true 
-			var sprite_rect = backHoeSprite.get_rect()
-			backHoeSprite.move_local_x(64+sprite_rect.size.x) 
-	if state == Facing.RIGHT:
-		if animation != "right":
-			backHoeSprite.flip_h = false
-			var sprite_rect = backHoeSprite.get_rect()
-			backHoeSprite.move_local_x(-64-sprite_rect.size.x) 
+
+		
 func _unhandled_input(event):
 	if !tilemap:
 		print("no tilemap on input recieved")
@@ -144,40 +124,84 @@ func _unhandled_input(event):
 		return
 	if is_moving:
 		return  
-	
+
 	var now_facing : Facing
 	var dir = Vector2i.ZERO
 
 	if event.is_action_pressed("ui_up"):
-		dir = Vector2i(0, -1)
 		now_facing = Facing.UP
+		dir = Vector2i(0, -1)
 	elif event.is_action_pressed("ui_down"):
-		dir = Vector2i(0, 1)
 		now_facing = Facing.DOWN
+		dir = Vector2i(0, 1)
 	elif event.is_action_pressed("ui_left"):
-		dir = Vector2i(-1, 0)
 		now_facing = Facing.LEFT
+		dir = Vector2i(-1, 0)
 	elif event.is_action_pressed("ui_right"):
-		dir = Vector2i(1, 0)
 		now_facing = Facing.RIGHT
+		dir = Vector2i(1, 0)
 
 	if dir != Vector2i.ZERO:
-		if try_move(dir, now_facing, player_facing):
-			turns +=1 
-			player_facing = now_facing
+		# Check if trying to go opposite direction of visual facing = toggle reverse
+		if now_facing == get_opposite_facing(visual_facing):
+			reverse = true
+		elif now_facing != visual_facing:
+			if can_face(now_facing):
+				visual_facing = now_facing
+				reverse = false  # Turning cancels reverse
+			else:
+				return  # Can't turn this way
+			reverse = false 
+		# Update player_facing based on visual and reverse state
+		player_facing = get_opposite_facing(visual_facing) if reverse else visual_facing
+		
+		if try_move(dir, visual_facing, player_facing):
+			turns += 1
+		
 		tracker.take_turn()
-	
-	if event.is_action_pressed("ui_accept"):
-		$Sprite2D/AnimationPlayer.play("backHoe")		
+		update_animation(visual_facing)
 
+	if event.is_action_pressed("ui_accept"):
+		if has_node("backhoeSprites"):
+			$backhoeSprites.scoop_debris(grid_pos, visual_facing)
+
+	
+
+
+func can_face(target_facing: Facing) -> bool:
+	var forbidden_facing = get_opposite_facing(player_facing)
+	return target_facing != forbidden_facing
+
+func get_opposite_facing(facing: Facing) -> Facing:
+	match facing:
+		Facing.UP: return Facing.DOWN
+		Facing.DOWN: return Facing.UP
+		Facing.LEFT: return Facing.RIGHT
+		Facing.RIGHT: return Facing.LEFT
+	return facing
+
+	
 func try_move(dir: Vector2i, now_facing:Facing, currently_facing:Facing) -> bool:
 	var target = grid_pos + dir
 	if resolve_movement(target, now_facing, currently_facing):
 		grid_pos = target
-	
 		return true
 	trigger_push_fail(now_facing)
 	return false 
+
+
+func check_dragged_collision(dir: Vector2i)-> bool:
+	if !has_node("backhoeSprites"):
+		return false	
+	if $backhoeSprites.dragged_tree != null:
+		var tree = $backhoeSprites.dragged_tree as Entity
+		for pos in tree.get_world_positions():
+			for debris in get_tree().get_nodes_in_group("debris"):
+				if debris == tree:
+					continue
+				if debris.occupies(pos + dir):
+					return true
+	return false
 
 func resolve_movement(target: Vector2i, now_facing: Facing, currently_facing:Facing) -> bool:
 	if (tilemap.get_cell_source_id(target) == -1 or 
@@ -190,6 +214,10 @@ func resolve_movement(target: Vector2i, now_facing: Facing, currently_facing:Fac
 		return resolve_entity_interaction_with_player(target, now_facing, currently_facing)
 
 func resolve_entity_interaction_with_player(target: Vector2i, new_facing: Facing, currently_facing: Facing) -> bool:
+	if reverse: 
+		for debris in get_tree().get_nodes_in_group("debris"):
+			if debris.occupies(target):
+				return false 
 	for debris in get_tree().get_nodes_in_group("debris"):
 		# Check if target hits ANY tile of this entity
 		debris = debris as Entity
@@ -201,12 +229,12 @@ func resolve_entity_interaction_with_player(target: Vector2i, new_facing: Facing
 			print("player cant move because no run up to push")
 			return false
 		if !debris.broken:
-			pushing = true
-			debris.bulldoze(currently_facing)
-			return true
+			var bulldozed = debris.bulldoze(currently_facing)
+			if bulldozed:
+				pushing = true
+			return bulldozed
 		if debris.broken:
 			return debris.push(currently_facing)
-	
 	return true  # No debris at target
 
 

@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=4 uid="uid://b5wm7uxh70w5w"]
+[gd_scene load_steps=7 format=4 uid="uid://b5wm7uxh70w5w"]
 
 [ext_resource type="Script" uid="uid://uhiewv2g8r22" path="res://maps/map.gd" id="1_ebk6l"]
 [ext_resource type="TileSet" uid="uid://bydf6q7xrag3d" path="res://dozer.tres" id="1_o07xg"]
@@ -6,7 +6,6 @@
 [ext_resource type="Texture2D" uid="uid://didrdplorak41" path="res://art/truckLayer1.png" id="2_ebk6l"]
 [ext_resource type="Texture2D" uid="uid://dfl5xtwntv5e3" path="res://art/truckLayer2.png" id="3_wq2xb"]
 [ext_resource type="PackedScene" uid="uid://cscul4aciwrgd" path="res://debrisBig.tscn" id="4_75bwh"]
-[ext_resource type="PackedScene" uid="uid://c0wdauhw1f5a6" path="res://tree.tscn" id="5_wq2xb"]
 
 [node name="map1" type="Node2D" node_paths=PackedStringArray("Player_start_pos")]
 script = ExtResource("1_ebk6l")
@@ -16,7 +15,8 @@ Player_start_pos = NodePath("player_start")
 script = ExtResource("2_75bwh")
 metadata/_edit_lock_ = true
 
-[node name="visualTileFences" type="TileMapLayer" parent="tilemap"]
+[node name="visualFences" type="TileMapLayer" parent="tilemap"]
+z_index = 2
 position = Vector2(1, 0)
 tile_map_data = PackedByteArray("AAAAAAcAAAAAAAEAAAABAAcAAAAAAAEAAAACAAcAAAAAAAEAAAADAAcAAAAAAAEAAAAEAAcAAAAAAAEAAAAFAAcAAAAAAAEAAAAGAAcAAAAAAAEAAAAHAAcAAAAAAAEAAAAIAAcAAAAAAAEAAAAJAAcAAAAAAAEAAAAKAAcAAAAAAAEAAAALAAcAAAAAAAEAAAAMAAcAAAAAAAEAAAANAAcAAAAAAAEAAAAOAAcAAAAAAAEAAAD//wYAAAAAAAIAAQD//wUAAAAAAAIAAQD//wQAAAAAAAIAAQD//wMAAAAAAAIAAQD//wIAAAAAAAIAAQD//wEAAAAAAAIAAQD//wAAAAAAAAIAAQD/////AAAAAAIAAQD//wcAAAABAAMAAQAPAAYAAAAAAAIAAAAPAAUAAAAAAAIAAAAPAAQAAAAAAAIAAAAPAAMAAAAAAAIAAAAPAAIAAAAAAAIAAAAPAAEAAAAAAAIAAAAPAP//AAAAAAIAAAAPAAAAAAAAAAIAAAAPAAcAAAABAAMAAAA=")
 tile_set = ExtResource("1_o07xg")
@@ -43,27 +43,31 @@ texture = ExtResource("3_wq2xb")
 [node name="interactables" type="Node2D" parent="."]
 z_index = 1
 
-[node name="Tree2" parent="interactables" node_paths=PackedStringArray("tilemap_fences_layer", "tilemap") instance=ExtResource("5_wq2xb")]
-visible = true
-position = Vector2(217, 164)
-tilemap_fences_layer = NodePath("../../tilemap/fences")
-tilemap = NodePath("../../tilemap/tiles")
-
-[node name="Tree" parent="interactables" node_paths=PackedStringArray("tilemap_fences_layer", "tilemap") instance=ExtResource("5_wq2xb")]
-visible = true
-position = Vector2(411, 102)
-tilemap_fences_layer = NodePath("../../tilemap/fences")
-tilemap = NodePath("../../tilemap/tiles")
-
 [node name="debris2" parent="interactables" node_paths=PackedStringArray("tilemap") instance=ExtResource("4_75bwh")]
 position = Vector2(538, 226)
 tilemap = NodePath("../../tilemap/tiles")
 
 [node name="debris3" parent="interactables" node_paths=PackedStringArray("tilemap") instance=ExtResource("4_75bwh")]
-position = Vector2(481, 161)
+position = Vector2(416, 224)
+tilemap = NodePath("../../tilemap/tiles")
+
+[node name="debris7" parent="interactables" node_paths=PackedStringArray("tilemap") instance=ExtResource("4_75bwh")]
+position = Vector2(416, 31)
+tilemap = NodePath("../../tilemap/tiles")
+
+[node name="debris8" parent="interactables" node_paths=PackedStringArray("tilemap") instance=ExtResource("4_75bwh")]
+position = Vector2(609, 30)
+tilemap = NodePath("../../tilemap/tiles")
+
+[node name="debris6" parent="interactables" node_paths=PackedStringArray("tilemap") instance=ExtResource("4_75bwh")]
+position = Vector2(480, 225)
 tilemap = NodePath("../../tilemap/tiles")
 
 [node name="debris4" parent="interactables" node_paths=PackedStringArray("tilemap") instance=ExtResource("4_75bwh")]
+position = Vector2(352, 292)
+tilemap = NodePath("../../tilemap/tiles")
+
+[node name="debris5" parent="interactables" node_paths=PackedStringArray("tilemap") instance=ExtResource("4_75bwh")]
 position = Vector2(352, 292)
 tilemap = NodePath("../../tilemap/tiles")
 
