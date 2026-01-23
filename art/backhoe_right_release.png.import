@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dagqko3xd3c2j"
-path="res://.godot/imported/backhoeLeft.png-535e072ec1362a8b648db8f436bd496d.ctex"
+uid="uid://kd63hn5kc4ws"
+path="res://.godot/imported/backhoe_right_release.png-a8d5bafcacec838a39ddf5d3ce0277c8.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://art/backhoeLeft.png"
-dest_files=["res://.godot/imported/backhoeLeft.png-535e072ec1362a8b648db8f436bd496d.ctex"]
+source_file="res://art/backhoe_right_release.png"
+dest_files=["res://.godot/imported/backhoe_right_release.png-a8d5bafcacec838a39ddf5d3ce0277c8.ctex"]
 
 [params]
 
