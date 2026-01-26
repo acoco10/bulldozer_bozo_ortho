@@ -1,0 +1,85 @@
+[gd_scene load_steps=3 format=3 uid="uid://b4koex2j17meo"]
+
+[ext_resource type="Theme" uid="uid://bp5vfv8jgvon8" path="res://maps/contract_them.tres" id="1_krppj"]
+[ext_resource type="Script" uid="uid://cs6jqn7rx4ry5" path="res://scripts/results.gd" id="2_krppj"]
+
+[node name="results_panel" type="Control"]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -320.0
+offset_top = -160.0
+offset_right = -320.0
+offset_bottom = -160.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2_krppj")
+
+[node name="results_panel" type="Panel" parent="."]
+z_index = 2
+custom_minimum_size = Vector2(1200, 1200)
+layout_direction = 1
+layout_mode = 1
+offset_right = 1338.0
+offset_bottom = 1395.0
+theme = ExtResource("1_krppj")
+
+[node name="MarginContainer" type="MarginContainer" parent="results_panel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -486.5
+offset_top = -634.0
+offset_right = 486.5
+offset_bottom = 634.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_krppj")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="results_panel/MarginContainer"]
+custom_minimum_size = Vector2(600, 400)
+layout_mode = 2
+theme = ExtResource("1_krppj")
+
+[node name="title" type="Label" parent="results_panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Results"
+horizontal_alignment = 1
+
+[node name="outcome" type="Label" parent="results_panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="time_remaining" type="Label" parent="results_panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/paragraph_spacing = 0
+theme_override_font_sizes/font_size = 80
+text = "
+"
+vertical_alignment = 1
+
+[node name="rank" type="Label" parent="results_panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="you_lost" type="Label" parent="results_panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/paragraph_spacing = 0
+theme_override_font_sizes/font_size = 80
+text = "Citizen #9243 expired on mission, 
+outstanding debts will be 
+transferred to next of kin"
+vertical_alignment = 1
+
+[node name="Button" type="Button" parent="results_panel"]
+layout_mode = 2
+offset_left = 186.0
+offset_top = 1068.0
+offset_right = 1159.0
+offset_bottom = 1148.0
+theme = ExtResource("1_krppj")
+text = "> Continue"

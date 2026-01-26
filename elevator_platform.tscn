@@ -1,0 +1,22 @@
+[gd_scene load_steps=4 format=3 uid="uid://djhiip3tgbaow"]
+
+[ext_resource type="Script" uid="uid://b6snvfgxtyvri" path="res://scripts/entities/elevator_platform.gd" id="1_p1gf3"]
+[ext_resource type="Texture2D" uid="uid://c8uh88oqu0lws" path="res://art/mining_platform.png" id="2_51rss"]
+[ext_resource type="Texture2D" uid="uid://bjku0uwf1nk4j" path="res://art/mining_platform_chain.png" id="3_51rss"]
+
+[node name="elevator_platform" type="Node2D"]
+z_index = 1
+script = ExtResource("1_p1gf3")
+shape_type = 5
+change_z_on_enter = true
+
+[node name="MiningPlatform" type="Sprite2D" parent="."]
+position = Vector2(-32, 0)
+texture = ExtResource("2_51rss")
+metadata/_edit_lock_ = true
+
+[node name="MiningPlatformChain" type="Sprite2D" parent="."]
+z_index = 5
+z_as_relative = false
+position = Vector2(-31, -414)
+texture = ExtResource("3_51rss")

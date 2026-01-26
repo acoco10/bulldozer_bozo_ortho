@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=3 uid="uid://dp4y7mta0ywy7"]
+
+[ext_resource type="Texture2D" uid="uid://c8kd4o3gdyq1m" path="res://art/hard_rock.png" id="1_nj342"]
+[ext_resource type="Script" uid="uid://bsyt5y1nlei3a" path="res://scripts/entities/debris.gd" id="1_xbegn"]
+
+[node name="unbreakable_debris" type="Node2D"]
+script = ExtResource("1_xbegn")
+
+[node name="HardRock" type="Sprite2D" parent="."]
+position = Vector2(1, -1)
+texture = ExtResource("1_nj342")

@@ -1,23 +1,31 @@
 extends Node2D
 
 @onready var gTrack: gameTracker = $gametracker
-signal end_of_day(contract_completed: bool)
+@onready var camera: Camera2D = $Player/bulldozer_sprite/Camera2D
+@onready var time_tracker: timer = $timer
+@onready var time_ui: countdown_ui = $CanvasLayer/countdown_ui
+signal end_of_day(debris_harvested: int, debris_available: int, time_remaining_minutes: int, lost: bool)
 
 func _ready() -> void:
 	gTrack.connect("player_finished", _on_day_finished)
 	
 func _on_day_finished():
-	await get_tree().create_timer(2.0).timeout
+	
+	time_ui.visible = false 
+	print("dozer scene publishing end of day")
+	await get_tree().create_timer(1.6).timeout
 	gTrack.leave_scene()
 	$CanvasLayer.visible = false 
-	if gTrack.current_contract_finished:
-		end_of_day.emit({"contract_completed":true})
-	else:
-		end_of_day.emit()
+	end_of_day.emit({"debris_harvested": gTrack.cleanedDebris, 
+					"debris_available": gTrack.n_uncleared_debris, 
+					"time_remaining_minutes": time_tracker.current_minutes,
+					"lost": gTrack.lost})
 	
-func on_enter():
-	$Player.times_up = false 
-	$Player.play()
+func on_enter(retry: bool):
 	$CanvasLayer.visible = true 
-	gTrack.enter_scene()
+	gTrack.enter_scene(retry)
 	
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventKey:
+		if event.key_label == KEY_R:
+			gTrack.enter_scene(true)

@@ -19,12 +19,16 @@ var current_fences_map: TileMapLayer
 var best_turns: int = 0 
 var turns: int = 1 
 
+var leave_button = Button_Tile
+var elevator_countdown: int = -1
 
-@export var timeTracker: timer
-@export var TrackerLabel: Label
+var lost: bool = false 
+
+@export var timeTracker: countdown_ui
 @export var ClearedDebris: Label
-@export var ContractCompleted: Label
-@export var QuittingTime: Label
+@export var timer: timer
+
+@export var player: DirectionalCharacter
 
 signal new_map_instance(player_start_pos:Vector2i)
 
@@ -43,106 +47,99 @@ func _ready() -> void:
 					
 	load_cur_map()
 
-
-
 func load_cur_map():
+	print("loading map: %d", %map_index)
+	n_uncleared_debris = 0 
 	if current_map_node:
 		current_map_node.queue_free()
 	current_map_node = maps[map_index].instantiate()
 	get_parent().add_child(current_map_node)
 	current_map = current_map_node.get_node("tilemap").get_node("tiles")
 	map_index += 1 
-	new_map_instance.emit({"player_pos":current_map_node.Player_start_pos.global_position})
+	new_map_instance.emit({"player_pos":current_map_node.Player_start_pos.global_position, "facing":current_map_node.Player_start_pos.Direction})
 	current_fences_map = current_map_node.fences
-	for debris in get_tree().get_nodes_in_group("debris"):
-		debris = debris as Entity
-		if current_map_node.fences:
+	
+	configure_map_entities()
+	
+	current_map_node._enter_map_scene()
+	best_turns = load_best_score(current_map_node.name)	
+	timeTracker.visible = true 
+	timer.set_countdown_length(current_map_node.timeLimitHours * 60 + current_map_node.timeLimitMinutes)
+	update_text(Day, current_contract, cleanedDebris, timer.get_time_string())
+	
+func configure_map_entities():
+	for debris in current_map_node.debris_node.get_children():
+		debris = debris as Debris
+		if debris != null and debris.mineral:
+			debris.tilemap = current_map
 			debris.tilemap_fences_layer = current_fences_map
-		debris.tilemap = current_map
-		debris.connect("DebrisBrokenUp", _on_debris_broken_up)
-		if debris.split:
 			n_uncleared_debris +=2
-		else:
-			n_uncleared_debris +=1
+	player.tilemap_fences_layer = current_fences_map
 
-	best_turns = load_best_score(current_map_node.name)
+		
+func _on_leave_button():
+	"trigger elevator count down"
+	elevator_countdown = 3 
 	
 func leave_scene():
-	ContractCompleted.visible = false 
-	QuittingTime.visible = false 
+	turns = 0 
 	
-func enter_scene():
-	if current_contract_finished:
-		n_uncleared_debris = 0 
-		load_cur_map()
+func enter_scene(retry: bool):
+	current_contract_finished = false 
+	if retry:
+		lost = false 
+		map_index-=1 
+	else:
+		Day += 1 
 		current_contract +=1 
-		current_contract_finished = false 
-		cleanedDebris = 0 
-	Day += 1 
-	timeTracker.reset()
-
-func _on_debris_cleaned():
-	cleanedDebris+=1 
-	debris_queue.append(true)
-	_process_debris_queue()
-	
 		
+	n_uncleared_debris = 0 
+	load_cur_map()
+	cleanedDebris = 0 
+
+
+func check_if_all_mineral_on_platform() -> bool:
+	for debris in get_tree().get_nodes_in_group("debris"):
+		if !current_map_node.elevator_platform.occupies(debris.grid_pos) and debris.mineral:
+			return false
+	return true
+	
 func take_turn() -> bool: 
 	turns += 1 
-	update_text(Day, current_contract, cleanedDebris, timeTracker.get_time_string())
-	if timeTracker.advance_time():
-		QuittingTime.visible = true
-		player_finished.emit()
-		return true 
+	update_text(Day, current_contract, cleanedDebris, timer.get_time_string())
+	var player_reached_elevator = current_map_node.elevator_platform.occupies(player.grid_pos)
+	if check_if_all_mineral_on_platform() and player_reached_elevator:		
+			trigger_leave_scene()
+			return false
+	if timer.current_minutes == 0:
+		if current_map_node.elevator_platform.occupies(player.grid_pos):
+			trigger_leave_scene()
+			return false
+		current_map_node.advance_lava(0.15)
+		if player.fence_at(player.grid_pos) and !player_reached_elevator:
+			lost = true 
+			trigger_leave_scene()
+			return false 
+	timer.advance_time()
+	
 	return false 
 
-func _process_debris_queue():
-	if debris_queue.is_empty():
-		if cleanedDebris == n_uncleared_debris and !current_contract_finished: 
-			if turns < best_turns || best_turns == -1:
-				save_best_score(current_map_node.name, turns)
-			QuittingTime.text = "Looks like you finished the contract, call it a day and get out of here"
-			QuittingTime.visible = true
-			current_contract_finished = true 
-			player_finished.emit()
-		return
-	if is_showing_label:
-		return
-	
-	is_showing_label = true
-	debris_queue.pop_front()
-	
-	var start_pos = ClearedDebris.position
-	ClearedDebris.visible = true
-	ClearedDebris.modulate.a = 1.0
-	
-	var tween = create_tween()
-	tween.set_parallel(true)
-	tween.tween_property(ClearedDebris, "position:y", ClearedDebris.position.y - 100, 0.3).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
-	tween.tween_property(ClearedDebris, "modulate:a", 0.0, 0.3).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_QUAD)
-	
-	await tween.finished
-	
-	ClearedDebris.visible = false
-	ClearedDebris.position = start_pos
-	ClearedDebris.modulate.a = 1.0
-	
-	is_showing_label = false
-	_process_debris_queue()
+func trigger_leave_scene():
+	for debris in current_map_node.debris_node.get_children():
+		if debris as Debris:
+			if current_map_node.elevator_platform.occupies(debris.grid_pos) and debris.mineral:
+				if debris.broken:
+					cleanedDebris +=1
+				else:
+					cleanedDebris +=2
+	if player.backhoe.has_dirt != null:
+		cleanedDebris+=1 
+	current_map_node.elevator_platform.trigger_leave()
+	player_finished.emit()
 
-
-func _on_debris_broken_up():
-	for debris in get_tree().get_nodes_in_group("debris"):
-		if not debris.is_connected("DebrisCleaned", _on_debris_cleaned):
-				debris.connect("DebrisCleaned", _on_debris_cleaned)
-				
-func _unhandled_input(event: InputEvent) -> void:
-	if event is InputEventKey:
-		if event.key_label == KEY_R:
-			get_tree().reload_current_scene()
 			
 func update_text(current_day: int, current_contract: int, n_debris_cleaned: int, timestring: String) -> void:
-	TrackerLabel.text = "Day %d\nTraining Gig:%d\nDebris Cleaned: %d/%d\n Current Turns: %d\n Best Turns: %d\n" %[current_day, current_contract, n_debris_cleaned, n_uncleared_debris, turns, best_turns]
+	timeTracker.set_time_text(timestring, timer.current_minutes)
 	
 func save_best_score(level_name: String, turns: int):
 	var config = ConfigFile.new()

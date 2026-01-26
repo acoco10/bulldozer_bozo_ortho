@@ -15,64 +15,37 @@ const BACKHOE_CONFIG = {
 	}
 }
 
+var current_sprite: AnimatedSprite2D
+
 var has_dirt: Entity = null
-var dragged_tree: Entity = null 
-var facing_at_tree_drag: DirectionalCharacter.Facing
-var connection_index: int
+var released_dirt: Entity = null 
 
-func check_dragged_collision(direction: Vector2i) ->bool:
-	if dragged_tree != null:
-		for pos in dragged_tree.get_world_positions():
-			for debris in get_tree().get_nodes_in_group("debris"):
-				if debris == dragged_tree:
-					continue
-				if debris.occupies(pos + direction + dragged_tree.grid_pos):
-					return true
-	return false
-
+@onready var animations: Array[AnimatedSprite2D] = [$up, $down, $left, $right]
 
 func update_backhoe(player_pos: Vector2i, visual_state: DirectionalCharacter.Facing, move_state: DirectionalCharacter.Facing):
 	
-	# Show the correct one based on facing and reverse state
-	var bulldozer_size = Vector2i(64,64)
-	var backhoe_texture: Texture
-	var offset := Vector2.ZERO
-	
+
+	for anim in animations:
+		anim.visible = false
+		
 	match visual_state:
 		DirectionalCharacter.Facing.LEFT:
-			backhoe_texture = preload("res://art/backhoeRight.png")
-			offset = Vector2(60, 0)
-		
+			current_sprite = $left
+			$left.visible = true 
 		DirectionalCharacter.Facing.RIGHT:
-			backhoe_texture = preload("res://art/backhoeLeft.png")
-			offset = Vector2(-60, 0)
-		
+			current_sprite = $right
+			$right.visible = true 
 		DirectionalCharacter.Facing.UP:
-			backhoe_texture = preload("res://art/backhoeup.png")
-			offset = Vector2(0, 16)
-		
+			current_sprite = $up
+			$up.visible = true
 		DirectionalCharacter.Facing.DOWN:
-			backhoe_texture = preload("res://art/backhoeFront.png")
-			offset = Vector2(0, -43)
-	
-	$backhoe.texture = backhoe_texture
-	$backhoe.position = offset
+			current_sprite = $down
+			$down.visible = true 
+
 	
 	var scoop_pos = get_backhoe_config_offset(player_pos, move_state)
 	update_dirt_position(scoop_pos)
 	
-	if dragged_tree != null:
-		if facing_at_tree_drag != visual_state:
-			release_debris(scoop_pos, visual_state)
-		else:
-			update_dragged_tree_position(scoop_pos)
-	
-	
-func update_input(dir: Vector2i, player_pos: Vector2i, visual_state: DirectionalCharacter.Facing):
-	var scoop_pos = get_backhoe_config_offset(player_pos, visual_state)
-	if dragged_tree != null:
-		if check_dragged_collision(dir):
-			release_debris(scoop_pos, visual_state)
 		
 
 func get_backhoe_config_offset(player_pos: Vector2i, player_facing:DirectionalCharacter.Facing) -> Vector2i:
@@ -83,95 +56,108 @@ func get_backhoe_config_offset(player_pos: Vector2i, player_facing:DirectionalCh
 	return player_pos + backhoe_data["offset"]
 
 
-func scoop_debris(player_pos: Vector2i, player_facing:DirectionalCharacter.Facing) -> bool:
+func scoop_debris(player_pos: Vector2i, player_facing:DirectionalCharacter.Facing) -> String:
 	var scoop_pos = get_backhoe_config_offset(player_pos, player_facing)
 	var res = try_scoop_at(scoop_pos, player_facing)
-	if res:
-		$backhoe/AnimationPlayer.play("backHoe")
-	return res 
+	if res != "na":
+		#play all to keep synched only current sprite should use await asynch timing
+		for anim in animations:
+			if anim != current_sprite:
+				match res:
+					"scooped":
+						anim.play("scoop")
+					"released":
+						anim.play("release")
+		match res:
+			"scooped":
+				current_sprite.play("scoop")
+				scoop_debris_async()
+				if has_dirt.push_power:
+					return "push_power_scooped"
+				else:
+					return res 
+			"released":
+				current_sprite.play("release")
+				release_debris_async(scoop_pos, player_facing)
+				return res
+	return ""
 	
+func wait_for_frame(sprite: AnimatedSprite2D, frame_num: int):
+	await sprite.frame_changed
+	while sprite.frame < frame_num:
+		await sprite.frame_changed
+
+func reset():
+	for anim in animations:
+		anim.animation = "scoop"
+		anim.set_frame_and_progress(0,0)
+
+func scoop_debris_async():
+	var second_to_last = current_sprite.sprite_frames.get_frame_count("scoop") - 2
+	await wait_for_frame(current_sprite, second_to_last)
+	has_dirt.visible = false
+	
+func release_debris_async(scoop_pos: Vector2i, player_facing:DirectionalCharacter.Facing ):
+	var second_to_last = current_sprite.sprite_frames.get_frame_count("release") - 2
+	await wait_for_frame(current_sprite, second_to_last)
+	release_debris(scoop_pos, player_facing)
 	
 func release_debris(pos: Vector2i, facing:DirectionalCharacter.Facing)->bool:
-	if has_dirt || dragged_tree:
+	if has_dirt:
+		update_dirt_position(pos)
 		for debris in get_tree().get_nodes_in_group("debris"):
 			if debris == has_dirt:
 				continue
 			if !debris.occupies(pos):
 				continue
-			if debris.split and debris.broken:
+			if debris.broken:
 				has_dirt.recombine_debris(has_dirt, debris)
-			elif debris.split:
+			elif !debris.broken:
 				has_dirt.push(facing)
-			else:
-				return false 
-		if has_dirt != null:		
-			has_dirt.visible = true 
-			has_dirt.add_to_group("debris")
+		has_dirt.visible = true 
+		has_dirt.add_to_group("debris")
+		has_dirt.scooped = false 
 		has_dirt = null 
-		dragged_tree = null 
 		return true 
 	return false 
-		
-		
-
 	
-func try_scoop_at(pos: Vector2i, facing:DirectionalCharacter.Facing) -> bool:
-	if has_dirt || dragged_tree:
-		release_debris(pos, facing)
-		return true
+func try_scoop_at(pos: Vector2i, facing:DirectionalCharacter.Facing) -> String:
+	if has_dirt:
+		return "released"
 	else:
-		return attatch_debris(pos, facing)
+		if attatch_debris(pos, facing):
+			return "scooped"
+		else:
+			return "na"
 	
 
 func attatch_debris(pos: Vector2i, facing:DirectionalCharacter.Facing):
 	for debris in get_tree().get_nodes_in_group("debris"):
-		if debris.occupies(pos):
-			debris = debris as Entity
-			if debris.broken:
-				if debris.local_positions.size() > 1: #trees
-					var world_pos = debris.get_world_positions()
-					for pos_index in len(world_pos):
-						if world_pos[pos_index] == pos:
-							connection_index = pos_index
-					dragged_tree = debris
-					facing_at_tree_drag = facing
-				else:
-					has_dirt = debris
-			if debris.split and !debris.broken:
-				has_dirt = debris.back_hoe_break_up_debris() #be careful here, this returns a copy but the orignal debris should not be removed from group 
-			
-			if has_dirt != null:
-				has_dirt.remove_from_group("debris")
-				has_dirt.visible = false 
-			return true
+		debris = debris as Debris
+		if !debris.occupies(pos):
+			continue
+		if debris.breakable:
+			scoop_breakable_debris(debris)
+		elif  debris.scoopable:
+			has_dirt = debris
+		if has_dirt != null:
+			has_dirt.scooped = true 
+			has_dirt.remove_from_group("debris")
+		return true
 	return false 
 
-func find_connection_point(grid_pos: Vector2i) -> int:
-	# Find which local position of the tree is adjacent to the player
-	var tree_world_positions = dragged_tree.get_world_positions()
-	
-	for i in tree_world_positions.size():
-		# Check if this position is adjacent to player
-		var diff = tree_world_positions[i] - grid_pos
-		if diff.length() == 1:  # Manhattan distance of 1
-			return i
-	
-	return 0  # Fallback
-	
+func scoop_breakable_debris(debris: Debris):
+	if debris.broken:
+		has_dirt = debris
+	if !debris.broken:
+		has_dirt = debris.back_hoe_break_up_debris() 
+		#be careful here, this returns a copy but the orignal debris should not be removed from group 
+		
 func update_dirt_position(dirt_pos: Vector2i):
 	if has_dirt != null:
 		has_dirt.grid_pos = dirt_pos
+		has_dirt.sync_position_to_grid_pos()
 		
-func update_dragged_tree_position(dirt_pos: Vector2i):
-	if dragged_tree == null:
-		return
-	
-	# Calculate where grid_pos should be based on connection point
-	var connection_world_pos = dirt_pos
-	var connection_local_pos = dragged_tree.local_positions[connection_index]
-	
-	# Grid pos = where connection point is in world - its local offset
-	dragged_tree.grid_pos = connection_world_pos - connection_local_pos
 	
 func mirror_direction(dir: DirectionalCharacter.Facing)-> DirectionalCharacter.Facing:
 	if dir == DirectionalCharacter.Facing.UP:
@@ -183,8 +169,5 @@ func mirror_direction(dir: DirectionalCharacter.Facing)-> DirectionalCharacter.F
 	elif dir == DirectionalCharacter.Facing.RIGHT:
 		return DirectionalCharacter.Facing.LEFT
 	return dir 
-func set_backhoe_muddy(muddy: bool) -> void:
-	var texture = preload("res://art/backhoeRightMud.png") if muddy else preload("res://art/backhoeRight.png")
-	$rightbackhoe.texture = texture
-	$leftbackhoe.texture = texture
+	
 	# Add other backhoe directions if needed
