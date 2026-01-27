@@ -23,7 +23,6 @@ func animate_action(action: DebrisAction):
 # ===== PUSH ANIMATION =====
 func animate_push(action: DebrisAction):
 	var debris = action.debris
-	var from_world = tilemap.map_to_local(action.from_pos)
 	var to_world = tilemap.map_to_local(action.to_pos)
 	
 	# Slide tween

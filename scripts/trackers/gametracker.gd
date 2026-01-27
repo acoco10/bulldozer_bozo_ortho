@@ -11,10 +11,11 @@ var Day: int = 1
 var debris_in_contract
 
 var maps: Array 
-var map_index: int = 0
+var map_index: int = 1
 var current_map: TileMapLayer
 var current_map_node: map
 var current_fences_map: TileMapLayer
+var current_ent_grid: EntityGrid
 
 var best_turns: int = 0 
 var turns: int = 1 
@@ -31,7 +32,6 @@ var lost: bool = false
 @export var player: DirectionalCharacter
 
 signal new_map_instance(player_start_pos:Vector2i)
-
 signal player_finished
 
 func _ready() -> void:
@@ -54,6 +54,7 @@ func load_cur_map():
 		current_map_node.queue_free()
 	current_map_node = maps[map_index].instantiate()
 	get_parent().add_child(current_map_node)
+	current_ent_grid = current_map_node.ent_grid
 	current_map = current_map_node.get_node("tilemap").get_node("tiles")
 	map_index += 1 
 	new_map_instance.emit({"player_pos":current_map_node.Player_start_pos.global_position, "facing":current_map_node.Player_start_pos.Direction})
@@ -65,16 +66,13 @@ func load_cur_map():
 	best_turns = load_best_score(current_map_node.name)	
 	timeTracker.visible = true 
 	timer.set_countdown_length(current_map_node.timeLimitHours * 60 + current_map_node.timeLimitMinutes)
-	update_text(Day, current_contract, cleanedDebris, timer.get_time_string())
+	update_text(timer.get_time_string())
 	
 func configure_map_entities():
-	for debris in current_map_node.debris_node.get_children():
+	for debris in current_map_node.ent_grid.get_children():
 		debris = debris as Debris
 		if debris != null and debris.mineral:
-			debris.tilemap = current_map
-			debris.tilemap_fences_layer = current_fences_map
 			n_uncleared_debris +=2
-	player.tilemap_fences_layer = current_fences_map
 
 		
 func _on_leave_button():
@@ -99,14 +97,16 @@ func enter_scene(retry: bool):
 
 
 func check_if_all_mineral_on_platform() -> bool:
-	for debris in get_tree().get_nodes_in_group("debris"):
-		if !current_map_node.elevator_platform.occupies(debris.grid_pos) and debris.mineral:
-			return false
+	for key in current_map_node.ent_grid.entities:
+		var debris = current_map_node.ent_grid.entities[key] 
+		if debris as Debris:
+			if !current_map_node.elevator_platform.occupies(debris.grid_pos) and debris.mineral:
+				return false
 	return true
 	
 func take_turn() -> bool: 
 	turns += 1 
-	update_text(Day, current_contract, cleanedDebris, timer.get_time_string())
+	update_text(timer.get_time_string())
 	var player_reached_elevator = current_map_node.elevator_platform.occupies(player.grid_pos)
 	if check_if_all_mineral_on_platform() and player_reached_elevator:		
 			trigger_leave_scene()
@@ -116,7 +116,8 @@ func take_turn() -> bool:
 			trigger_leave_scene()
 			return false
 		current_map_node.advance_lava(0.15)
-		if player.fence_at(player.grid_pos) and !player_reached_elevator:
+		if current_ent_grid.lava_at(player.grid_pos) and !player_reached_elevator:
+			player.sink()
 			lost = true 
 			trigger_leave_scene()
 			return false 
@@ -125,23 +126,24 @@ func take_turn() -> bool:
 	return false 
 
 func trigger_leave_scene():
-	for debris in current_map_node.debris_node.get_children():
+	for key in current_map_node.ent_grid.entities:
+		var debris = current_map_node.ent_grid.entities[key] 
 		if debris as Debris:
 			if current_map_node.elevator_platform.occupies(debris.grid_pos) and debris.mineral:
 				if debris.broken:
 					cleanedDebris +=1
 				else:
 					cleanedDebris +=2
-	if player.backhoe.has_dirt != null:
+	if player.backhoe.is_carrying():
 		cleanedDebris+=1 
 	current_map_node.elevator_platform.trigger_leave()
 	player_finished.emit()
 
 			
-func update_text(current_day: int, current_contract: int, n_debris_cleaned: int, timestring: String) -> void:
+func update_text(timestring: String) -> void:
 	timeTracker.set_time_text(timestring, timer.current_minutes)
 	
-func save_best_score(level_name: String, turns: int):
+func save_best_score(level_name: String, turns_this_run: int):
 	var config = ConfigFile.new()
 	var save_path = "user://level_scores.cfg"
 
@@ -150,7 +152,7 @@ func save_best_score(level_name: String, turns: int):
 
 	# Only save if it's better than existing score (or first time)
 	var current_best = config.get_value(level_name, "best_turns", INF)
-	if turns < current_best:
+	if turns_this_run < current_best:
 		config.set_value(level_name, "best_turns", turns)
 		config.save(save_path)
 

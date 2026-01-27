@@ -21,7 +21,7 @@ func pressed():
 	print("Button Pressed By Player")
 	button_pressed.emit()
 	
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	if is_pressed:
 		var still_pressed = false 
 		var player = get_tree().get_first_node_in_group("player")

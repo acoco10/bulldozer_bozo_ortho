@@ -4,30 +4,34 @@ extends Node2D
 @onready var canvas_layer = $CanvasLayer
 @onready var contract = $CanvasLayer/contract
 @onready var results = $CanvasLayer/results_panel
+@onready var entrance = $entrance
 
 var need_new_contract: bool 
 var day1: bool = true
 var lost: bool = false 
+
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey:
 		if event.key_label == KEY_R:
-			get_tree().reload_current_scene()
+			_on_reset()
 			
 			
 func _ready() -> void:
 	#signals:
-	contract.connect("contract_accepted", _on_contract_accepted)
 	results.connect("next_day", _on_next_day)
 	dozerScene.connect("end_of_day", _on_end_of_day)
+	dozerScene.connect("reset", _on_reset)
+	entrance.connect("leave_scene", _on_enter)
 	
 	untrigger_results_scene()
 	untrigger_dozer_scene()
-	trigger_contract_scene()
 
-
-func _on_contract_accepted() -> void:
+func _on_enter():
+	entrance.queue_free()
 	trigger_dozer_scene()
-	untrigger_contract_scene()
+
+func _on_reset():
+	get_tree().reload_current_scene()
 	
 func _on_end_of_day(data: Dictionary) -> void: 
 	print("end of day recieved")	
@@ -38,14 +42,14 @@ func _on_end_of_day(data: Dictionary) -> void:
 
 
 func _on_next_day() -> void: 
-	print("next day recieved")
 	untrigger_results_scene()
-	trigger_contract_scene()
+	trigger_dozer_scene()
 
 func trigger_dozer_scene() -> void:
 	if !day1:
 		dozerScene.on_enter(lost)
 		lost = false
+	dozerScene.first_enter()
 	day1 = false 
 	dozerScene.camera.enabled = true 
 	dozerScene.visible = true
@@ -63,11 +67,3 @@ func trigger_results_scene() -> void:
 func untrigger_results_scene() -> void:
 	results.process_mode = Node.PROCESS_MODE_DISABLED
 	results.visible = false
-
-func trigger_contract_scene() -> void:
-	contract.process_mode = PROCESS_MODE_INHERIT
-	contract.visible = true 
-	
-func untrigger_contract_scene() -> void:
-	contract.visible = false 
-	contract.process_mode = PROCESS_MODE_DISABLED	

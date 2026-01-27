@@ -1,6 +1,6 @@
 extends TileMapLayer
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	clear()
 	for entity in get_tree().get_nodes_in_group("entities"):
 			entity = entity as Entity

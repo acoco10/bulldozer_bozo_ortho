@@ -11,12 +11,13 @@
 [ext_resource type="Script" uid="uid://dlb80q1ci0ut5" path="res://maps/player_start.gd" id="6_adeal"]
 [ext_resource type="PackedScene" uid="uid://djhiip3tgbaow" path="res://elevator_platform.tscn" id="7_mvk67"]
 
-[node name="map1" type="Node2D" node_paths=PackedStringArray("Player_start_pos", "elevator_platform", "debris_node")]
+[node name="map1" type="Node2D" node_paths=PackedStringArray("Player_start_pos", "elevator_platform", "debris_node", "ent_grid")]
 script = ExtResource("1_7q8e6")
 Player_start_pos = NodePath("Marker2D")
-elevator_platform = NodePath("elevator_platform")
+elevator_platform = NodePath("interactables/elevator_platform")
 timeLimitMinutes = 700
 debris_node = NodePath("interactables")
+ent_grid = NodePath("interactables")
 
 [node name="tilemap" type="Node2D" parent="."]
 script = ExtResource("2_foyvx")
@@ -41,52 +42,41 @@ z_index = 4
 tile_set = ExtResource("3_vlwm5")
 script = ExtResource("4_5k564")
 
-[node name="interactables" type="Node2D" parent="."]
+[node name="interactables" type="Node2D" parent="." node_paths=PackedStringArray("lava", "land")]
 z_index = 1
 script = ExtResource("5_5k564")
+lava = NodePath("../tilemap/fences")
+land = NodePath("../tilemap/tiles")
 
-[node name="unbreakable_debris" parent="interactables" node_paths=PackedStringArray("Platform", "tilemap_fences_layer", "tilemap") instance=ExtResource("5_foyvx")]
+[node name="elevator_platform" parent="interactables" instance=ExtResource("7_mvk67")]
+z_as_relative = false
+position = Vector2(845, -32)
+
+[node name="unbreakable_debris" parent="interactables" node_paths=PackedStringArray("Platform") instance=ExtResource("5_foyvx")]
 position = Vector2(990, 30)
-Platform = NodePath("../../elevator_platform")
-tilemap_fences_layer = NodePath("../../tilemap/fences")
-tilemap = NodePath("../../tilemap/tiles")
+Platform = NodePath("../elevator_platform")
 
-[node name="debris6" parent="interactables" node_paths=PackedStringArray("Platform", "tilemap_fences_layer", "tilemap") instance=ExtResource("5_mxsnq")]
+[node name="debris6" parent="interactables" node_paths=PackedStringArray("Platform") instance=ExtResource("5_mxsnq")]
 position = Vector2(609, 31)
-Platform = NodePath("../../elevator_platform")
-tilemap_fences_layer = NodePath("../../tilemap/fences")
-tilemap = NodePath("../../tilemap/tiles")
+Platform = NodePath("../elevator_platform")
 
-[node name="debris7" parent="interactables" node_paths=PackedStringArray("Platform", "tilemap_fences_layer", "tilemap") instance=ExtResource("5_mxsnq")]
+[node name="debris7" parent="interactables" node_paths=PackedStringArray("Platform") instance=ExtResource("5_mxsnq")]
 position = Vector2(545, 30)
-Platform = NodePath("../../elevator_platform")
-tilemap_fences_layer = NodePath("../../tilemap/fences")
-tilemap = NodePath("../../tilemap/tiles")
+Platform = NodePath("../elevator_platform")
 
-[node name="debris8" parent="interactables" node_paths=PackedStringArray("Platform", "tilemap_fences_layer", "tilemap") instance=ExtResource("5_mxsnq")]
+[node name="debris8" parent="interactables" node_paths=PackedStringArray("Platform") instance=ExtResource("5_mxsnq")]
 position = Vector2(416, 34)
-Platform = NodePath("../../elevator_platform")
-tilemap_fences_layer = NodePath("../../tilemap/fences")
-tilemap = NodePath("../../tilemap/tiles")
+Platform = NodePath("../elevator_platform")
 
-[node name="debris9" parent="interactables" node_paths=PackedStringArray("Platform", "tilemap_fences_layer", "tilemap") instance=ExtResource("5_mxsnq")]
+[node name="debris9" parent="interactables" node_paths=PackedStringArray("Platform") instance=ExtResource("5_mxsnq")]
 position = Vector2(290, 33)
-Platform = NodePath("../../elevator_platform")
-tilemap_fences_layer = NodePath("../../tilemap/fences")
-tilemap = NodePath("../../tilemap/tiles")
+Platform = NodePath("../elevator_platform")
 
-[node name="debris_push_power" parent="interactables" node_paths=PackedStringArray("Platform", "tilemap_fences_layer", "tilemap") instance=ExtResource("5_vlwm5")]
+[node name="debris_push_power" parent="interactables" node_paths=PackedStringArray("Platform") instance=ExtResource("5_vlwm5")]
 position = Vector2(1064, 97)
-Platform = NodePath("../../elevator_platform")
-tilemap_fences_layer = NodePath("../../tilemap/fences")
-tilemap = NodePath("../../tilemap/tiles")
+Platform = NodePath("../elevator_platform")
 
 [node name="Marker2D" type="Marker2D" parent="."]
 position = Vector2(738, -35)
 script = ExtResource("6_adeal")
 Direction = 2
-
-[node name="elevator_platform" parent="." node_paths=PackedStringArray("tilemap_fences_layer", "tilemap") instance=ExtResource("7_mvk67")]
-position = Vector2(845, -32)
-tilemap_fences_layer = NodePath("../tilemap/fences")
-tilemap = NodePath("../tilemap/tiles")

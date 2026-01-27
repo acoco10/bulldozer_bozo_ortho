@@ -10,11 +10,10 @@
 [node name="dozer" type="Node2D"]
 script = ExtResource("1_82cqt")
 
-[node name="gametracker" type="Node2D" parent="." node_paths=PackedStringArray("timeTracker", "ClearedDebris", "timer", "player")]
+[node name="gametracker" type="Node2D" parent="." node_paths=PackedStringArray("timeTracker", "timer", "player")]
 position = Vector2(1, 0)
 script = ExtResource("2_82cqt")
 timeTracker = NodePath("../CanvasLayer/countdown_ui")
-ClearedDebris = NodePath("../CanvasLayer/debris_cleared_graphic")
 timer = NodePath("../timer")
 player = NodePath("../Player")
 
@@ -26,6 +25,7 @@ position = Vector2(862, 605)
 tracker = NodePath("../gametracker")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
+visible = false
 
 [node name="countdown_ui" parent="CanvasLayer" instance=ExtResource("4_82cqt")]
 offset_left = 700.0
@@ -33,32 +33,7 @@ offset_top = 732.0
 offset_right = 700.0
 offset_bottom = 732.0
 
-[node name="debris_cleared_graphic" type="Label" parent="CanvasLayer"]
-visible = false
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -283.0
-offset_top = -68.5
-offset_right = 283.0
-offset_bottom = 68.5
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/outline_size = 2
-theme_override_font_sizes/font_size = 100
-text = "Debris Cleared!"
-
-[node name="tracker_text" type="Label" parent="CanvasLayer"]
-visible = false
-offset_left = 13.0
-offset_top = 11.0
-offset_right = 53.0
-offset_bottom = 66.0
-theme_override_font_sizes/font_size = 40
-
-[node name="Control" parent="CanvasLayer" instance=ExtResource("5_exrei")]
+[node name="controls" parent="CanvasLayer" instance=ExtResource("5_exrei")]
 offset_left = 689.0
 offset_top = 1343.0
 offset_right = 729.0

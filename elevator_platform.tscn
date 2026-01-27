@@ -5,10 +5,10 @@
 [ext_resource type="Texture2D" uid="uid://bjku0uwf1nk4j" path="res://art/mining_platform_chain.png" id="3_51rss"]
 
 [node name="elevator_platform" type="Node2D"]
-z_index = 1
+z_index = 3
+z_as_relative = false
 script = ExtResource("1_p1gf3")
 shape_type = 5
-change_z_on_enter = true
 
 [node name="MiningPlatform" type="Sprite2D" parent="."]
 position = Vector2(-32, 0)

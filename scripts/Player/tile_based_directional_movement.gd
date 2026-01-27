@@ -13,33 +13,51 @@ var push_strength: int
 var reverse: bool 
 var scooped_debris: bool 
 var last_animation
-
 var push_power_up
+var is_sinking: bool
 
+var sprites: Array
 enum Facing { UP, DOWN, LEFT, RIGHT }
 
 @export var tracker: gameTracker
 @export var times_up: bool 
 @onready var backhoe = $backhoeSprites
 @onready var state_label = $state
+@export var ent_grid: EntityGrid
 
+var sink_tween: Tween = Tween.new()
 func _ready():
+	
+	var shader = load("res://shaders/sinking_shader.gdshader")
+	sprites = [$bulldozer_sprite,$backhoeSprites]
+	#_apply_shader_to_children(self, shader)
 	add_to_group("player")
 	tracker.connect("player_finished", _on_player_finished)
 	tracker.connect("new_map_instance", _on_new_map)
 	
-
+func sink():
+	sink_tween = create_tween()
+	sink_tween.tween_property(self, "global_position:y", global_position.y + 40,2.0)
+	for sprite in sprites:
+		sprite.start_sinking()
+		
 func _on_player_finished():
 	times_up = true 
 	$bulldozer_sprite.stop()
 
 func _on_new_map(data: Dictionary):
+	for sprite in sprites:
+		sprite.reset()
+	
+	if sink_tween.is_valid():
+		sink_tween.kill()
 	print("player got new map")
 	print("map = %s", tracker.current_map.name)
-	tilemap = tracker.current_map 
+	ent_grid = tracker.current_ent_grid
 	global_position = data.player_pos as Vector2i  
-	grid_pos = tilemap.local_to_map(global_position)
-	visual_pos = tilemap.map_to_local(grid_pos)
+	grid_pos = ent_grid.land.local_to_map(global_position)
+	ent_grid.sync_position_to_grid_pos(self)
+	visual_pos = ent_grid.land.map_to_local(grid_pos)
 	var start_face = data.facing
 	
 	
@@ -52,7 +70,7 @@ func _on_new_map(data: Dictionary):
 func _process(delta):
 	if canned_animation:
 		return 
-	if !tilemap:
+	if !ent_grid:
 		print("no tilemap on process")
 		return
 	if push_fail_tween and push_fail_tween.is_running():
@@ -61,7 +79,7 @@ func _process(delta):
 		return
 		
 	# Visual smoothly catches up to logical position
-	var target = tilemap.map_to_local(grid_pos)
+	var target = ent_grid.land.map_to_local(grid_pos)
 	if pushing:
 		visual_pos = visual_pos.move_toward(target, 5* delta * 60)
 		var strain = sin(Time.get_ticks_msec() * 0.03) * 2.0
@@ -74,6 +92,8 @@ func _process(delta):
 	is_moving = visual_pos.distance_to(target) > 1.0
 	if !is_moving and pushing:
 		pushing = false 
+	
+	
 	
 
 func trigger_push_fail(directionFlag: DirectionalCharacter.Facing):
@@ -121,7 +141,7 @@ func update_animation(state: Facing):
 	$bulldozer_sprite.animation = animation_name
 
 func _unhandled_input(event):
-	if !tilemap:
+	if !ent_grid:
 		print("no tilemap on input recieved")
 		return 
 	if times_up:
@@ -158,21 +178,17 @@ func _unhandled_input(event):
 		# Update player_facing based on visual and reverse state
 		player_facing = get_opposite_facing(visual_facing) if reverse else visual_facing
 		
-		if try_move(dir, visual_facing, player_facing):
+		if try_move(dir, visual_facing):
 			turns += 1
+			on_player_move()
 		
 		tracker.take_turn()
 		update_animation(visual_facing)
 
 	if event.is_action_pressed("ui_accept"):
-		if has_node("backhoeSprites"):
-			var res = $backhoeSprites.scoop_debris(grid_pos, visual_facing)
-			if res == "push_power_scooped":
-				push_power_up = true 
-			else:
-				push_power_up = false 
+		handle_backhoe_action(grid_pos, player_facing)
 			
-	
+
 
 func get_opposite_facing(facing: Facing) -> Facing:
 	match facing:
@@ -183,49 +199,64 @@ func get_opposite_facing(facing: Facing) -> Facing:
 	return facing
 
 	
-func try_move(dir: Vector2i, now_facing:Facing, currently_facing:Facing) -> bool:
+func try_move(dir: Vector2i, now_facing:Facing) -> bool:
+	if backhoe.is_carrying():
+		if backhoe.carried_debris.push_power:
+			push_power_up = true 
+		else:
+			push_power_up = false
+	else:
+		push_power_up = false 
 	var target = grid_pos + dir
-	if resolve_movement(target, now_facing, currently_facing):
+	if resolve_movement(target, now_facing):
 		grid_pos = target
 		return true
 	trigger_push_fail(now_facing)
 	return false 
 
 func on_enter():
+	z_index = 4
 	enter_animation()
 	times_up = false 
 	$bulldozer_sprite.play()
 	$backhoeSprites.reset()
 
-func resolve_movement(target: Vector2i, now_facing: Facing, currently_facing:Facing) -> bool:
-	if (tilemap.get_cell_source_id(target) == -1 or 
-	tilemap.get_cell_atlas_coords(target) == Vector2i(1,0) or 
-	tilemap.get_cell_atlas_coords(target) == Vector2i(3,0) or
-	tracker.current_fences_map.get_cell_source_id(target) != -1) and !tracker.current_map_node.elevator_platform.occupies(target):
+func resolve_movement(target: Vector2i, now_facing: Facing) -> bool:
+	
+	if ent_grid.lava.get_cell_source_id(target) != -1 :
 		print("player cant move becuase would place on invalid tile")
 		return false 
 	else:
-		return resolve_entity_interaction_with_player(target, now_facing, currently_facing)
-
-func resolve_entity_interaction_with_player(target: Vector2i, new_facing: Facing, currently_facing: Facing) -> bool:
-	if reverse: 
-		for debris in get_tree().get_nodes_in_group("debris"):
-			if debris.occupies(target):
-				return false 
-	for debris in get_tree().get_nodes_in_group("debris"):
-		# Check if target hits ANY tile of this entity
-		debris = debris as Debris
-		var hits_debris = false
-		hits_debris = debris.occupies(target)
-		if !hits_debris:
-			continue
-		if debris.breakable and !debris.broken:
-			debris.bulldoze(new_facing)
-			return true 
-		if debris.pushable:
-			return debris.push(currently_facing)
-		if push_power_up and !debris.pushable:
-			return debris.push(currently_facing, true)
-		return false 
+		return ent_grid.resolve_entity_interaction_with_player(self, target, now_facing)
+		
+func handle_backhoe_action(player_pos: Vector2i, facing: DirectionalCharacter.Facing):
+	var scoop_offset = backhoe.get_scoop_offset(visual_facing)
+	var scoop_pos = player_pos + scoop_offset
 	
-	return true  # No debris at target
+	if backhoe.is_carrying():
+		# Try to release
+		var debris = backhoe.carried_debris
+		await backhoe.play_release_animation()
+		
+		if ent_grid.release_scooped_debris(debris, scoop_pos, facing):
+			# Success - backhoe already cleared carried_debris
+			pass
+		else:
+			# Failed to release, pick it back up (shouldn't happen often)
+			backhoe.carried_debris = debris
+			debris.scooped = true
+			debris.visible = false
+	else:
+		# Try to scoop
+		var scooped = ent_grid.scoop_debris_at(scoop_pos)
+		if scooped != null:
+			await backhoe.play_scoop_animation(scooped)
+			# Check for power-ups, etc.
+			if scooped.push_power:
+				push_power_up = true
+
+# Call this when player moves with carried debris
+func on_player_move():
+	if backhoe.is_carrying():
+		var carry_pos = grid_pos + backhoe.get_scoop_offset(visual_facing)
+		backhoe.update_carried_debris_visual(ent_grid.land, carry_pos)

@@ -9,7 +9,7 @@ extends Node2D
 @export var timeLimitMinutes: int
 @export var timeLimitHours: int
 @export var n_minerals: int
-@export var debris_node: Node2D
+@export var ent_grid: EntityGrid
 
 
 const LAVA_ATLAS_COORDS = Vector2i(4, 0)
@@ -17,14 +17,12 @@ const DIRECTIONS = [Vector2i(0, 1), Vector2i(0, -1), Vector2i(1, 0), Vector2i(-1
 
 func _ready() -> void:
 	for child in get_children():
-		var ent = child as Entity
+		var ent = child as Debris
 		if ent:
-			ent.tilemap_fences_layer = fences
-			ent.tilemap = $tilemap/tiles
 			n_minerals +=2
 
 func _enter_map_scene():
-	$"elevator_platform".enter_animation()
+	$"interactables/elevator_platform".enter_animation()
 
 
 func is_tile_bordering_lava(tile_pos: Vector2i) -> bool:
@@ -53,3 +51,4 @@ func advance_lava(probability_of_lava: float = 1.0):
 	# Convert tiles to lava
 	for tile_pos in tiles_to_convert:
 		fences.set_cell(tile_pos, 0, LAVA_ATLAS_COORDS)
+	fences.add_new_lava(tiles_to_convert)
