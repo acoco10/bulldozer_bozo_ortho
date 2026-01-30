@@ -1,0 +1,86 @@
+[gd_scene load_steps=5 format=3 uid="uid://bfow8rs7ma88h"]
+
+[ext_resource type="Texture2D" uid="uid://dtwkkorvpd8im" path="res://art/demerit_slot.png" id="1_t3s32"]
+[ext_resource type="Texture2D" uid="uid://6lv3254sjbfg" path="res://art/retry_token_slot.png" id="2_yymh3"]
+[ext_resource type="Texture2D" uid="uid://bgxd688aom8im" path="res://art/retry_token.png" id="3_wucn5"]
+[ext_resource type="Texture2D" uid="uid://ciq76pniw2x8f" path="res://art/demerit.png" id="4_k2jsj"]
+
+[node name="demerit_retry_icons" type="Node2D"]
+
+[node name="DemeritSlot" type="Sprite2D" parent="."]
+z_index = 10
+position = Vector2(157, 121)
+scale = Vector2(2, 2)
+texture = ExtResource("1_t3s32")
+
+[node name="DemeritSlot2" type="Sprite2D" parent="."]
+z_index = 10
+position = Vector2(314, 119)
+scale = Vector2(2, 2)
+texture = ExtResource("1_t3s32")
+
+[node name="RetryTokenSlot" type="Sprite2D" parent="."]
+z_index = 10
+position = Vector2(153, 290)
+scale = Vector2(2, 2)
+texture = ExtResource("2_yymh3")
+
+[node name="RetryTokenSlot2" type="Sprite2D" parent="."]
+z_index = 10
+position = Vector2(317, 292)
+scale = Vector2(2, 2)
+texture = ExtResource("2_yymh3")
+
+[node name="RetryTokenSlot3" type="Sprite2D" parent="."]
+z_index = 10
+position = Vector2(479, 291)
+scale = Vector2(2, 2)
+texture = ExtResource("2_yymh3")
+
+[node name="RetryToken" type="Sprite2D" parent="."]
+visible = false
+z_index = 10
+z_as_relative = false
+position = Vector2(152, 290)
+scale = Vector2(2, 2)
+texture = ExtResource("3_wucn5")
+
+[node name="RetryToken2" type="Sprite2D" parent="."]
+visible = false
+z_index = 10
+z_as_relative = false
+position = Vector2(316, 292)
+scale = Vector2(2, 2)
+texture = ExtResource("3_wucn5")
+
+[node name="RetryToken3" type="Sprite2D" parent="."]
+visible = false
+z_index = 10
+z_as_relative = false
+position = Vector2(479, 291)
+scale = Vector2(2, 2)
+texture = ExtResource("3_wucn5")
+
+[node name="Demerit" type="Sprite2D" parent="."]
+visible = false
+z_index = 10
+z_as_relative = false
+position = Vector2(156, 120.5)
+scale = Vector2(2, 2)
+texture = ExtResource("4_k2jsj")
+
+[node name="Demerit2" type="Sprite2D" parent="."]
+visible = false
+z_index = 10
+z_as_relative = false
+position = Vector2(314, 119)
+scale = Vector2(2, 2)
+texture = ExtResource("4_k2jsj")
+
+[node name="Demerit3" type="Sprite2D" parent="."]
+visible = false
+z_index = 10
+z_as_relative = false
+position = Vector2(474, 118)
+scale = Vector2(2, 2)
+texture = ExtResource("4_k2jsj")

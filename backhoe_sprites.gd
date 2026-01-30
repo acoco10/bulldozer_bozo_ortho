@@ -69,7 +69,10 @@ func play_release_animation() -> void:
 	carried_debris.add_to_group("debris")
 	carried_debris.scooped = false
 	carried_debris = null
-
+	
+func play_no_dirt_animation() -> void:
+	play_all_animations("scoop_no_dirt")
+	play_current_animation("scoop_no_dirt")
 # Update visual position of carried debris (call this when player moves)
 func update_carried_debris_visual(land_tilemap: TileMapLayer, grid_pos: Vector2i):
 	if carried_debris != null:
@@ -87,7 +90,6 @@ func reset():
 # === ANIMATION HELPERS (private) ===
 func start_sinking():
 	current_sprite.start_sinking()
-
 
 func play_all_animations(anim_name: String):
 	for anim in animations:

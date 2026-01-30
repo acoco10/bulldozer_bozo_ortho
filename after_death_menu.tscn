@@ -1,0 +1,70 @@
+[gd_scene load_steps=3 format=3 uid="uid://t3kyqjk80ooe"]
+
+[ext_resource type="Script" uid="uid://dd4dvy7qlwamy" path="res://new_life_menu.gd" id="1_evq03"]
+[ext_resource type="Theme" uid="uid://bp5vfv8jgvon8" path="res://maps/contract_them.tres" id="2_ie0c8"]
+
+[node name="results_panel" type="Control"]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -320.0
+offset_top = -160.0
+offset_right = -320.0
+offset_bottom = -160.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_evq03")
+
+[node name="results_panel" type="Panel" parent="."]
+z_index = 2
+custom_minimum_size = Vector2(1200, 1200)
+layout_direction = 1
+layout_mode = 1
+offset_right = 1338.0
+offset_bottom = 1395.0
+theme = ExtResource("2_ie0c8")
+
+[node name="MarginContainer" type="MarginContainer" parent="results_panel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -486.5
+offset_top = -634.0
+offset_right = 486.5
+offset_bottom = 634.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_ie0c8")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="results_panel/MarginContainer"]
+custom_minimum_size = Vector2(600, 400)
+layout_mode = 2
+theme = ExtResource("2_ie0c8")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="results_panel/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 300)
+layout_mode = 2
+theme_override_constants/separation = 66
+
+[node name="message" type="Label" parent="results_panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/paragraph_spacing = 0
+theme_override_font_sizes/font_size = 80
+text = "Greetings citizen #9991. Harvest as many materials as you can. "
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="main_button" type="Button" parent="results_panel"]
+layout_mode = 0
+offset_left = -112.0
+offset_top = 1054.0
+offset_right = 861.0
+offset_bottom = 1134.0
+theme = ExtResource("2_ie0c8")
+text = "> Continue"

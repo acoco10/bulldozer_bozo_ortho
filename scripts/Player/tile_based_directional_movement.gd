@@ -15,6 +15,7 @@ var scooped_debris: bool
 var last_animation
 var push_power_up
 var is_sinking: bool
+var sunk: bool 
 
 var sprites: Array
 enum Facing { UP, DOWN, LEFT, RIGHT }
@@ -27,27 +28,26 @@ enum Facing { UP, DOWN, LEFT, RIGHT }
 
 var sink_tween: Tween = Tween.new()
 func _ready():
-	
-	var shader = load("res://shaders/sinking_shader.gdshader")
-	sprites = [$bulldozer_sprite,$backhoeSprites]
-	#_apply_shader_to_children(self, shader)
 	add_to_group("player")
 	tracker.connect("player_finished", _on_player_finished)
 	tracker.connect("new_map_instance", _on_new_map)
 	
 func sink():
 	sink_tween = create_tween()
+
+	backhoe.start_sinking()
+	$bulldozer_sprite.start_sinking()
 	sink_tween.tween_property(self, "global_position:y", global_position.y + 40,2.0)
-	for sprite in sprites:
-		sprite.start_sinking()
+	canned_animation = true 
+
 		
 func _on_player_finished():
 	times_up = true 
 	$bulldozer_sprite.stop()
 
 func _on_new_map(data: Dictionary):
-	for sprite in sprites:
-		sprite.reset()
+	backhoe.reset()
+	$bulldozer_sprite.reset()
 	
 	if sink_tween.is_valid():
 		sink_tween.kill()
@@ -77,7 +77,7 @@ func _process(delta):
 		global_position = visual_pos
 		is_moving = true  # Set the flag
 		return
-		
+
 	# Visual smoothly catches up to logical position
 	var target = ent_grid.land.map_to_local(grid_pos)
 	if pushing:
@@ -92,7 +92,10 @@ func _process(delta):
 	is_moving = visual_pos.distance_to(target) > 1.0
 	if !is_moving and pushing:
 		pushing = false 
+	if !is_moving and sunk:
+		call_deferred("sink")  # W
 	
+
 	
 	
 
@@ -214,18 +217,24 @@ func try_move(dir: Vector2i, now_facing:Facing) -> bool:
 	trigger_push_fail(now_facing)
 	return false 
 
+func reset_player_flags():
+	sunk = false 
+	times_up = false 
+
+
 func on_enter():
+	reset_player_flags()
+	if sink_tween.is_valid():
+		sink_tween.kill()
 	z_index = 4
 	enter_animation()
-	times_up = false 
 	$bulldozer_sprite.play()
 	$backhoeSprites.reset()
 
 func resolve_movement(target: Vector2i, now_facing: Facing) -> bool:
 	
-	if ent_grid.lava.get_cell_source_id(target) != -1 :
-		print("player cant move becuase would place on invalid tile")
-		return false 
+	if ent_grid.lava.get_cell_source_id(target) != -1:
+		return true
 	else:
 		return ent_grid.resolve_entity_interaction_with_player(self, target, now_facing)
 		
@@ -254,7 +263,8 @@ func handle_backhoe_action(player_pos: Vector2i, facing: DirectionalCharacter.Fa
 			# Check for power-ups, etc.
 			if scooped.push_power:
 				push_power_up = true
-
+		else:
+			backhoe.play_no_dirt_animation()
 # Call this when player moves with carried debris
 func on_player_move():
 	if backhoe.is_carrying():

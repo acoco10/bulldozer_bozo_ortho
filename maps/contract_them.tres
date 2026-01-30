@@ -1,10 +1,16 @@
-[gd_resource type="Theme" load_steps=5 format=3 uid="uid://bp5vfv8jgvon8"]
+[gd_resource type="Theme" load_steps=8 format=3 uid="uid://bp5vfv8jgvon8"]
 
 [ext_resource type="FontFile" uid="uid://bqkypnl1mwuqp" path="res://PixelOperator.ttf" id="1_tbpfx"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_tbpfx"]
 
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_054yx"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_cupeh"]
+
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_dbm75"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_pd1cb"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pknjm"]
 bg_color = Color(0.228511, 0.228511, 0.228511, 1)
@@ -20,14 +26,15 @@ corner_radius_bottom_left = 4
 
 [resource]
 Button/colors/font_color = Color(0.670588, 0.996078, 0.254902, 1)
+Button/colors/font_disabled_color = Color(0.114897065, 0.11489669, 0.11489678, 0.5019608)
 Button/font_sizes/font_size = 80
 Button/fonts/font = ExtResource("1_tbpfx")
 Button/icons/icon = null
 Button/styles/disabled = SubResource("StyleBoxEmpty_tbpfx")
-Button/styles/focus = null
-Button/styles/hover = null
+Button/styles/focus = SubResource("StyleBoxEmpty_054yx")
+Button/styles/hover = SubResource("StyleBoxEmpty_cupeh")
 Button/styles/normal = SubResource("StyleBoxEmpty_dbm75")
-Button/styles/pressed = null
+Button/styles/pressed = SubResource("StyleBoxEmpty_pd1cb")
 Label/colors/font_color = Color(0.66911, 0.996994, 0.25304, 1)
 Label/colors/font_shadow_color = Color(0.0431373, 0.0431373, 0.0431373, 0.588235)
 Label/constants/shadow_offset_x = -5
@@ -36,3 +43,6 @@ Label/constants/shadow_outline_size = 5
 Label/font_sizes/font_size = 80
 Label/fonts/font = ExtResource("1_tbpfx")
 Panel/styles/panel = SubResource("StyleBoxFlat_pknjm")
+RichTextLabel/colors/default_color = Color(5.0056e-06, 0.72199, 0.202709, 1)
+RichTextLabel/font_sizes/normal_font_size = 150
+RichTextLabel/fonts/normal_font = ExtResource("1_tbpfx")

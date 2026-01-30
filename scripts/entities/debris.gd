@@ -4,10 +4,10 @@ extends Entity
 @onready var sprite = $Sprite2D
 @export var Platform: Entity
 
-var broken: bool = false
 var cleaned_up: bool = false
 
 var scooped: bool = false 
+@export var broken: bool = false
 @export var breakable: bool 
 @export var mineral: bool 
 @export var pushable: bool 

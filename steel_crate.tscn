@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3 uid="uid://8bgg88ishygb"]
+
+[ext_resource type="Script" uid="uid://bsyt5y1nlei3a" path="res://scripts/entities/debris.gd" id="1_shlid"]
+[ext_resource type="Texture2D" uid="uid://v276yorrcpof" path="res://art/steel_crate.png" id="2_shlid"]
+
+[node name="unbreakable_debris" type="Node2D"]
+script = ExtResource("1_shlid")
+
+[node name="SteelCrate" type="Sprite2D" parent="."]
+texture = ExtResource("2_shlid")

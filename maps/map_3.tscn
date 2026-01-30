@@ -9,7 +9,7 @@
 [ext_resource type="Script" uid="uid://dlb80q1ci0ut5" path="res://maps/player_start.gd" id="7_75bwh"]
 [ext_resource type="PackedScene" uid="uid://djhiip3tgbaow" path="res://elevator_platform.tscn" id="7_ct1u7"]
 
-[node name="map1" type="Node2D" node_paths=PackedStringArray("Player_start_pos", "elevator_platform", "ent_grid")]
+[node name="map2" type="Node2D" node_paths=PackedStringArray("Player_start_pos", "elevator_platform", "ent_grid")]
 script = ExtResource("1_ebk6l")
 Player_start_pos = NodePath("Marker2D")
 elevator_platform = NodePath("interactables/elevator_platform")

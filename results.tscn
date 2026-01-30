@@ -1,7 +1,11 @@
-[gd_scene load_steps=3 format=3 uid="uid://b4koex2j17meo"]
+[gd_scene load_steps=7 format=3 uid="uid://b4koex2j17meo"]
 
 [ext_resource type="Theme" uid="uid://bp5vfv8jgvon8" path="res://maps/contract_them.tres" id="1_krppj"]
+[ext_resource type="PackedScene" uid="uid://bfow8rs7ma88h" path="res://demerit_retry_icons.tscn" id="2_7jyyn"]
 [ext_resource type="Script" uid="uid://cs6jqn7rx4ry5" path="res://scripts/results.gd" id="2_krppj"]
+[ext_resource type="Script" uid="uid://bl13daggbvw4g" path="res://rank.gd" id="3_5erdf"]
+[ext_resource type="Texture2D" uid="uid://bgxd688aom8im" path="res://art/retry_token.png" id="4_ph8o5"]
+[ext_resource type="Texture2D" uid="uid://ciq76pniw2x8f" path="res://art/demerit.png" id="5_7jyyn"]
 
 [node name="results_panel" type="Control"]
 layout_mode = 3
@@ -17,6 +21,8 @@ offset_bottom = -160.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("2_krppj")
+
+[node name="demerit_retry_icons" parent="." instance=ExtResource("2_7jyyn")]
 
 [node name="results_panel" type="Panel" parent="."]
 z_index = 2
@@ -47,6 +53,43 @@ custom_minimum_size = Vector2(600, 400)
 layout_mode = 2
 theme = ExtResource("1_krppj")
 
+[node name="HBoxContainer" type="HBoxContainer" parent="results_panel/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 300)
+layout_mode = 2
+theme_override_constants/separation = 66
+
+[node name="RetryToken" type="Sprite2D" parent="results_panel/MarginContainer/VBoxContainer/HBoxContainer"]
+visible = false
+position = Vector2(-30.5, 226.5)
+scale = Vector2(2, 2)
+texture = ExtResource("4_ph8o5")
+
+[node name="RetryToken2" type="Sprite2D" parent="results_panel/MarginContainer/VBoxContainer/HBoxContainer"]
+visible = false
+position = Vector2(133.5, 228.5)
+scale = Vector2(2, 2)
+texture = ExtResource("4_ph8o5")
+
+[node name="RetryToken3" type="Sprite2D" parent="results_panel/MarginContainer/VBoxContainer/HBoxContainer"]
+visible = false
+position = Vector2(296.5, 227.5)
+scale = Vector2(2, 2)
+texture = ExtResource("4_ph8o5")
+
+[node name="Demerit" type="Sprite2D" parent="results_panel/MarginContainer/VBoxContainer/HBoxContainer"]
+visible = false
+z_index = 10
+position = Vector2(-26.5, 57)
+scale = Vector2(2, 2)
+texture = ExtResource("5_7jyyn")
+
+[node name="Demerit2" type="Sprite2D" parent="results_panel/MarginContainer/VBoxContainer/HBoxContainer"]
+visible = false
+z_index = 10
+position = Vector2(131.5, 55.5)
+scale = Vector2(2, 2)
+texture = ExtResource("5_7jyyn")
+
 [node name="title" type="Label" parent="results_panel/MarginContainer/VBoxContainer"]
 layout_mode = 2
 text = "Results"
@@ -54,6 +97,7 @@ horizontal_alignment = 1
 
 [node name="outcome" type="Label" parent="results_panel/MarginContainer/VBoxContainer"]
 layout_mode = 2
+autowrap_mode = 2
 
 [node name="time_remaining" type="Label" parent="results_panel/MarginContainer/VBoxContainer"]
 layout_mode = 2
@@ -62,24 +106,38 @@ theme_override_font_sizes/font_size = 80
 text = "
 "
 vertical_alignment = 1
-
-[node name="rank" type="Label" parent="results_panel/MarginContainer/VBoxContainer"]
-layout_mode = 2
+autowrap_mode = 2
 
 [node name="you_lost" type="Label" parent="results_panel/MarginContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_constants/paragraph_spacing = 0
 theme_override_font_sizes/font_size = 80
-text = "Citizen #9243 expired on mission, 
-outstanding debts will be 
-transferred to next of kin"
 vertical_alignment = 1
+autowrap_mode = 2
 
-[node name="Button" type="Button" parent="results_panel"]
+[node name="rank" type="Label" parent="results_panel/MarginContainer/VBoxContainer"]
 layout_mode = 2
-offset_left = 186.0
-offset_top = 1068.0
-offset_right = 1159.0
-offset_bottom = 1148.0
+autowrap_mode = 2
+script = ExtResource("3_5erdf")
+
+[node name="feedback_text" type="Label" parent="results_panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "\"C\": \"Below Standards Citizen #9243.Demerit Recieved.\""
+autowrap_mode = 2
+
+[node name="main_button" type="Button" parent="results_panel"]
+layout_mode = 0
+offset_left = -112.0
+offset_top = 1054.0
+offset_right = 861.0
+offset_bottom = 1134.0
 theme = ExtResource("1_krppj")
 text = "> Continue"
+
+[node name="retry_button" type="Button" parent="results_panel"]
+layout_mode = 0
+offset_left = 219.0
+offset_top = 1146.0
+offset_right = 754.0
+offset_bottom = 1239.0
+text = "> Use Retry Token"

@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://djhiip3tgbaow"]
+[gd_scene load_steps=5 format=3 uid="uid://djhiip3tgbaow"]
 
 [ext_resource type="Script" uid="uid://b6snvfgxtyvri" path="res://scripts/entities/elevator_platform.gd" id="1_p1gf3"]
 [ext_resource type="Texture2D" uid="uid://c8uh88oqu0lws" path="res://art/mining_platform.png" id="2_51rss"]
 [ext_resource type="Texture2D" uid="uid://bjku0uwf1nk4j" path="res://art/mining_platform_chain.png" id="3_51rss"]
+[ext_resource type="PackedScene" uid="uid://cthhej3a06o5k" path="res://button.tscn" id="4_qq2bv"]
 
 [node name="elevator_platform" type="Node2D"]
 z_index = 3
@@ -20,3 +21,7 @@ z_index = 5
 z_as_relative = false
 position = Vector2(-31, -414)
 texture = ExtResource("3_51rss")
+
+[node name="button" parent="." instance=ExtResource("4_qq2bv")]
+z_index = 5
+position = Vector2(-125, 59)

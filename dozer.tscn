@@ -10,12 +10,16 @@
 [node name="dozer" type="Node2D"]
 script = ExtResource("1_82cqt")
 
-[node name="gametracker" type="Node2D" parent="." node_paths=PackedStringArray("timeTracker", "timer", "player")]
+[node name="gametracker" type="Node2D" parent="." node_paths=PackedStringArray("timeTracker", "player")]
 position = Vector2(1, 0)
 script = ExtResource("2_82cqt")
 timeTracker = NodePath("../CanvasLayer/countdown_ui")
-timer = NodePath("../timer")
 player = NodePath("../Player")
+
+[node name="timer" type="Node2D" parent="gametracker"]
+position = Vector2(-1, 0)
+script = ExtResource("5_82cqt")
+metadata/_edit_group_ = true
 
 [node name="Player" parent="." node_paths=PackedStringArray("tracker") instance=ExtResource("3_kchhy")]
 z_index = 2
@@ -38,7 +42,3 @@ offset_left = 689.0
 offset_top = 1343.0
 offset_right = 729.0
 offset_bottom = 1383.0
-
-[node name="timer" type="Node2D" parent="."]
-script = ExtResource("5_82cqt")
-metadata/_edit_group_ = true

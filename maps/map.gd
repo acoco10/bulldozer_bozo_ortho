@@ -23,6 +23,10 @@ func _ready() -> void:
 
 func _enter_map_scene():
 	$"interactables/elevator_platform".enter_animation()
+	for entity_id in $interactables.entities:
+		var entity = $interactables.entities[entity_id]
+		if entity.enter_with_elevator:
+			entity.enter_animation()
 
 
 func is_tile_bordering_lava(tile_pos: Vector2i) -> bool:

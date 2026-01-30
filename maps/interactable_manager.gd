@@ -5,13 +5,17 @@ var entities: Dictionary[Vector2i, Entity] = {}
 @export var land: TileMapLayer
 
 func _ready():
-	# Register all entities
-	for child in get_children():
+	register_scene_entities(self)
+	
+func register_scene_entities(input: Node2D):
+	for child in input.get_children():
 		if child is Entity:
 			child.grid_pos  = land.local_to_map(child.position)
 			sync_position_to_grid_pos(child)
 			register(child)
-
+			if input.get_child_count() > 0:
+				register_scene_entities(child)
+			
 func register(entity: Entity):
 	entities[entity.grid_pos] = entity
 	entity.tree_exiting.connect(func(): unregister(entity))

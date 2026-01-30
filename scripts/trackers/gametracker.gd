@@ -11,7 +11,7 @@ var Day: int = 1
 var debris_in_contract
 
 var maps: Array 
-var map_index: int = 1
+var map_index: int = 0
 var current_map: TileMapLayer
 var current_map_node: map
 var current_fences_map: TileMapLayer
@@ -19,17 +19,21 @@ var current_ent_grid: EntityGrid
 
 var best_turns: int = 0 
 var turns: int = 1 
-
 var leave_button = Button_Tile
 var elevator_countdown: int = -1
+var died: bool = false 
 
-var lost: bool = false 
+
+#player over all state 
+var demerits: int = 0
+var retry_tokens: int = 0 
+var bs_in_a_row: int = 0 
 
 @export var timeTracker: countdown_ui
-@export var ClearedDebris: Label
-@export var timer: timer
-
 @export var player: DirectionalCharacter
+
+@onready var turn_timer = $timer
+
 
 signal new_map_instance(player_start_pos:Vector2i)
 signal player_finished
@@ -65,8 +69,8 @@ func load_cur_map():
 	current_map_node._enter_map_scene()
 	best_turns = load_best_score(current_map_node.name)	
 	timeTracker.visible = true 
-	timer.set_countdown_length(current_map_node.timeLimitHours * 60 + current_map_node.timeLimitMinutes)
-	update_text(timer.get_time_string())
+	turn_timer.set_countdown_length(current_map_node.timeLimitHours * 60 + current_map_node.timeLimitMinutes)
+	update_text(turn_timer.get_time_string())
 	
 func configure_map_entities():
 	for debris in current_map_node.ent_grid.get_children():
@@ -81,11 +85,14 @@ func _on_leave_button():
 	
 func leave_scene():
 	turns = 0 
-	
+
+func reset_demerits():
+		demerits = 0 
+		
 func enter_scene(retry: bool):
-	current_contract_finished = false 
+	died = false 
+
 	if retry:
-		lost = false 
 		map_index-=1 
 	else:
 		Day += 1 
@@ -106,24 +113,28 @@ func check_if_all_mineral_on_platform() -> bool:
 	
 func take_turn() -> bool: 
 	turns += 1 
-	update_text(timer.get_time_string())
+	update_text(turn_timer.get_time_string())
 	var player_reached_elevator = current_map_node.elevator_platform.occupies(player.grid_pos)
+	if turn_timer.current_minutes == 5:
+		current_map_node.fences.ten_turns_left()
+
+	if current_ent_grid.lava_at(player.grid_pos) and !player_reached_elevator:
+			player.sunk = true 
+			died = true 
+			trigger_leave_scene()
+			return false 
 	if check_if_all_mineral_on_platform() and player_reached_elevator:		
 			trigger_leave_scene()
 			return false
-	if timer.current_minutes == 0:
+	if turn_timer.current_minutes == 0:
 		if current_map_node.elevator_platform.occupies(player.grid_pos):
 			trigger_leave_scene()
 			return false
 		current_map_node.advance_lava(0.15)
-		if current_ent_grid.lava_at(player.grid_pos) and !player_reached_elevator:
-			player.sink()
-			lost = true 
-			trigger_leave_scene()
-			return false 
-	timer.advance_time()
+	turn_timer.advance_time()
 	
 	return false 
+
 
 func trigger_leave_scene():
 	for key in current_map_node.ent_grid.entities:
@@ -141,7 +152,7 @@ func trigger_leave_scene():
 
 			
 func update_text(timestring: String) -> void:
-	timeTracker.set_time_text(timestring, timer.current_minutes)
+	timeTracker.set_time_text(timestring, turn_timer.current_minutes)
 	
 func save_best_score(level_name: String, turns_this_run: int):
 	var config = ConfigFile.new()

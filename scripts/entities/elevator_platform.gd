@@ -4,6 +4,9 @@ extends Entity
 
 func _ready() -> void:
 	super._ready()
+	if texture_path_name != "":
+		var name = "res://art/mining_platform_%s.png" %texture_path_name
+		$MiningPlatform.texture = load(name)
 
 var player_parent
 var player: Entity

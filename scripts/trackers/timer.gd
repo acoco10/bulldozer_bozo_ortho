@@ -1,4 +1,4 @@
-class_name timer
+class_name turn_based_timer
 extends Node2D
 
 var countdown_length: int = 270  # Default countdown in minutes (4.5 hours = 270 mins)
@@ -25,3 +25,6 @@ func get_time_string() -> String:
 
 func is_finished() -> bool:
 	return current_minutes <= 0
+
+func set_countdown_to_1():
+	current_minutes = 1 

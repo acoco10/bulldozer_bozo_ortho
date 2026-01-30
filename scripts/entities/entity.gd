@@ -20,6 +20,7 @@ var canned_animation: bool = false
 @export var shape_type: ShapeType = ShapeType.SINGLE
 @export var texture_path_name: String
 @export var change_z_to_on_enter: int
+@export var enter_with_elevator: bool 
 
 
 var debris_animator: DebrisAnimator = DebrisAnimator.new()
