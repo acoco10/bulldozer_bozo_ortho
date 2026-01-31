@@ -26,7 +26,8 @@ enum Facing { UP, DOWN, LEFT, RIGHT }
 @onready var state_label = $state
 @export var ent_grid: EntityGrid
 
-var sink_tween: Tween = Tween.new()
+var sink_tween: Tween = create_tween()
+
 func _ready():
 	add_to_group("player")
 	tracker.connect("player_finished", _on_player_finished)
@@ -270,3 +271,7 @@ func on_player_move():
 	if backhoe.is_carrying():
 		var carry_pos = grid_pos + backhoe.get_scoop_offset(visual_facing)
 		backhoe.update_carried_debris_visual(ent_grid.land, carry_pos)
+	if ent_grid.has_entity_at(grid_pos):
+		var but_check = ent_grid.entities[grid_pos] as elevator_button
+		if but_check != null:
+			but_check.press()

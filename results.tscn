@@ -4,8 +4,8 @@
 [ext_resource type="PackedScene" uid="uid://bfow8rs7ma88h" path="res://demerit_retry_icons.tscn" id="2_7jyyn"]
 [ext_resource type="Script" uid="uid://cs6jqn7rx4ry5" path="res://scripts/results.gd" id="2_krppj"]
 [ext_resource type="Script" uid="uid://bl13daggbvw4g" path="res://rank.gd" id="3_5erdf"]
-[ext_resource type="Texture2D" uid="uid://bgxd688aom8im" path="res://art/retry_token.png" id="4_ph8o5"]
-[ext_resource type="Texture2D" uid="uid://ciq76pniw2x8f" path="res://art/demerit.png" id="5_7jyyn"]
+[ext_resource type="Texture2D" uid="uid://bgxd688aom8im" path="res://art/ui/retry_token.png" id="4_ph8o5"]
+[ext_resource type="Texture2D" uid="uid://dmc70oiqn76es" path="res://art/ui/demerit.png" id="5_7jyyn"]
 
 [node name="results_panel" type="Control"]
 layout_mode = 3
@@ -23,6 +23,7 @@ grow_vertical = 2
 script = ExtResource("2_krppj")
 
 [node name="demerit_retry_icons" parent="." instance=ExtResource("2_7jyyn")]
+position = Vector2(0, 2)
 
 [node name="results_panel" type="Panel" parent="."]
 z_index = 2

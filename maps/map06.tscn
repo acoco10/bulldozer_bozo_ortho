@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=4 uid="uid://eh6eouh8h1ab"]
+[gd_scene load_steps=11 format=4 uid="uid://eh6eouh8h1ab"]
 
 [ext_resource type="Script" uid="uid://uhiewv2g8r22" path="res://maps/map.gd" id="1_pchjh"]
 [ext_resource type="Script" uid="uid://dw7t4me0c08sg" path="res://maps/tilemapController.gd" id="2_4gryy"]
@@ -7,6 +7,7 @@
 [ext_resource type="Script" uid="uid://dmrf0dcp5ujqa" path="res://maps/debug_layer.gd" id="5_a853c"]
 [ext_resource type="Script" uid="uid://gdvpd1x58nyr" path="res://maps/interactable_manager.gd" id="6_sg54u"]
 [ext_resource type="PackedScene" uid="uid://djhiip3tgbaow" path="res://elevator_platform.tscn" id="7_hvkr1"]
+[ext_resource type="PackedScene" uid="uid://8bgg88ishygb" path="res://steel_crate.tscn" id="7_pchjh"]
 [ext_resource type="PackedScene" uid="uid://cscul4aciwrgd" path="res://debrisBig.tscn" id="8_i027w"]
 [ext_resource type="Script" uid="uid://dlb80q1ci0ut5" path="res://maps/player_start.gd" id="10_gh7cy"]
 
@@ -49,6 +50,12 @@ land = NodePath("../tilemap/tiles")
 
 [node name="elevator_platform" parent="interactables" instance=ExtResource("7_hvkr1")]
 position = Vector2(845, -32)
+
+[node name="unbreakable_debris" parent="interactables" instance=ExtResource("7_pchjh")]
+z_index = 3
+z_as_relative = false
+position = Vector2(897, -91)
+enter_with_elevator = true
 
 [node name="debris7" parent="interactables" node_paths=PackedStringArray("Platform") instance=ExtResource("8_i027w")]
 position = Vector2(673, -95)

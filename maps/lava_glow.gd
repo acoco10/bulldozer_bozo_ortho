@@ -1,9 +1,10 @@
 extends TileMapLayer
-@export var glow_speed: float = 2.0
-@export var min_brightness: float = 0.8
-@export var max_brightness: float = 1.3
+@export var glow_speed: float = 1.0
+@export var min_brightness: float = 0.6
+@export var max_brightness: float = 1.1
 @export var new_lava_brightness: float = 2.0
 @export var new_lava_fade_time: float = 1.0
+
 var time: float = 0.0
 var new_lava_tiles: Dictionary = {}
 var danger_mode: bool = false  # Add this flag
@@ -17,7 +18,7 @@ func _process(delta: float) -> void:
 	
 	# Apply red tint if in danger mode, otherwise normal white glow
 	if danger_mode:
-		modulate = Color(brightness, brightness * 0.5, brightness * 0.3, 1.0)
+		modulate = Color(brightness, brightness * 0.8, brightness * 0.3, 1.0)
 	else:
 		modulate = Color(brightness, brightness, brightness, 1.0)
 	
@@ -34,6 +35,7 @@ func _process(delta: float) -> void:
 		_remove_glow_sprite(coord)
 
 func ten_turns_left() -> void:
+	glow_speed = 5
 	danger_mode = true
 
 func add_new_lava(coords: Array) -> void:

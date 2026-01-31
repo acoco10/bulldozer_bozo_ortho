@@ -19,6 +19,7 @@ func reset():
 	current_minutes = countdown_length
 
 func get_time_string() -> String:
+	@warning_ignore("integer_division")	
 	var hours = current_minutes / 60
 	var mins = current_minutes % 60
 	return "%d:%02d" % [hours, mins]

@@ -24,9 +24,9 @@ metadata/_edit_group_ = true
 [node name="Player" parent="." node_paths=PackedStringArray("tracker") instance=ExtResource("3_kchhy")]
 z_index = 2
 z_as_relative = false
-y_sort_enabled = true
 position = Vector2(862, 605)
 tracker = NodePath("../gametracker")
+change_z_to_on_enter = 3
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 visible = false

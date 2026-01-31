@@ -1,15 +1,15 @@
 [gd_scene load_steps=46 format=3 uid="uid://dcpjwe46nd5d2"]
 
 [ext_resource type="Script" uid="uid://bjpjj05grgqkf" path="res://backhoe_sprites.gd" id="1_qo05q"]
-[ext_resource type="Texture2D" uid="uid://bdjlcahutufk6" path="res://art/backhoe_down_release.png" id="2_bf3yk"]
-[ext_resource type="Texture2D" uid="uid://dbdx2i4pm87gi" path="res://art/backhoe_down.png" id="2_mrbga"]
-[ext_resource type="Texture2D" uid="uid://c6jryt78ywylq" path="res://art/backhoe_right.png" id="2_wb2jh"]
-[ext_resource type="Texture2D" uid="uid://dc4kn4w1ftmp" path="res://art/backhoe_up_release.png" id="3_i0tti"]
-[ext_resource type="Texture2D" uid="uid://c3pen1x51fdia" path="res://art/backhoe_up.png" id="3_xenpt"]
+[ext_resource type="Texture2D" uid="uid://bdjlcahutufk6" path="res://art/bulldozer/backhoe_down_release.png" id="2_bf3yk"]
+[ext_resource type="Texture2D" uid="uid://dbdx2i4pm87gi" path="res://art/bulldozer/backhoe_down.png" id="2_mrbga"]
+[ext_resource type="Texture2D" uid="uid://c6jryt78ywylq" path="res://art/bulldozer/backhoe_right.png" id="2_wb2jh"]
+[ext_resource type="Texture2D" uid="uid://dc4kn4w1ftmp" path="res://art/bulldozer/backhoe_up_release.png" id="3_i0tti"]
+[ext_resource type="Texture2D" uid="uid://c3pen1x51fdia" path="res://art/bulldozer/backhoe_up.png" id="3_xenpt"]
 [ext_resource type="Script" uid="uid://deag3xlpaq88m" path="res://sinking_shader.gd" id="4_3sjo1"]
-[ext_resource type="Texture2D" uid="uid://dkq7tgxqrks0l" path="res://art/backhoe_left.png" id="4_i0tti"]
-[ext_resource type="Texture2D" uid="uid://dc1vm42isjb5o" path="res://art/backhoe_left_release.png" id="5_f4ruw"]
-[ext_resource type="Texture2D" uid="uid://kd63hn5kc4ws" path="res://art/backhoe_right_release.png" id="7_bf3yk"]
+[ext_resource type="Texture2D" uid="uid://dkq7tgxqrks0l" path="res://art/bulldozer/backhoe_left.png" id="4_i0tti"]
+[ext_resource type="Texture2D" uid="uid://dc1vm42isjb5o" path="res://art/bulldozer/backhoe_left_release.png" id="5_f4ruw"]
+[ext_resource type="Texture2D" uid="uid://kd63hn5kc4ws" path="res://art/bulldozer/backhoe_right_release.png" id="7_bf3yk"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_5m5er"]
 atlas = ExtResource("2_bf3yk")
@@ -65,7 +65,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"release",
-"speed": 5.0
+"speed": 24.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -82,7 +82,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"scoop",
-"speed": 5.0
+"speed": 24.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -97,9 +97,9 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_sg1ob")
 }],
-"loop": true,
+"loop": false,
 "name": &"scoop_no_dirt",
-"speed": 5.0
+"speed": 24.0
 }]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_18db6"]
@@ -144,7 +144,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"release",
-"speed": 5.0
+"speed": 24.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -161,7 +161,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"scoop",
-"speed": 5.0
+"speed": 24.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -178,7 +178,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"scoop_no_dirt",
-"speed": 5.0
+"speed": 24.0
 }]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_4hap8"]
@@ -223,7 +223,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"release",
-"speed": 5.0
+"speed": 24.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -240,7 +240,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"scoop",
-"speed": 5.0
+"speed": 24.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -254,7 +254,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"scoop_no_dirt",
-"speed": 5.0
+"speed": 24.0
 }]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_d1n2r"]
@@ -299,7 +299,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"release",
-"speed": 5.0
+"speed": 24.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -316,7 +316,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"scoop",
-"speed": 5.0
+"speed": 24.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -330,7 +330,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"scoop_no_dirt",
-"speed": 5.0
+"speed": 24.0
 }]
 
 [node name="backhoeSprites" type="Node2D"]
@@ -341,19 +341,19 @@ script = ExtResource("1_qo05q")
 [node name="down" type="AnimatedSprite2D" parent="."]
 position = Vector2(-1, -42)
 sprite_frames = SubResource("SpriteFrames_18db6")
-animation = &"scoop_no_dirt"
+animation = &"release"
 script = ExtResource("4_3sjo1")
 
 [node name="up" type="AnimatedSprite2D" parent="."]
 position = Vector2(-1, 24)
 sprite_frames = SubResource("SpriteFrames_nqhfu")
-animation = &"scoop_no_dirt"
+animation = &"release"
 script = ExtResource("4_3sjo1")
 
 [node name="left" type="AnimatedSprite2D" parent="."]
 position = Vector2(60, -7)
 sprite_frames = SubResource("SpriteFrames_elkdr")
-animation = &"scoop_no_dirt"
+animation = &"release"
 script = ExtResource("4_3sjo1")
 
 [node name="right" type="AnimatedSprite2D" parent="."]

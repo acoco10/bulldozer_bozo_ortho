@@ -1,0 +1,33 @@
+[gd_scene load_steps=3 format=3 uid="uid://brtq1lf3ppscp"]
+
+[ext_resource type="Theme" uid="uid://bp5vfv8jgvon8" path="res://maps/contract_them.tres" id="1_2eo1p"]
+[ext_resource type="Script" uid="uid://bb3ngmhvi4iyw" path="res://clone_wake_up.gd" id="1_11uto"]
+
+[node name="clone_thoughts_scene" type="Node2D"]
+script = ExtResource("1_11uto")
+
+[node name="Label" type="Label" parent="."]
+z_index = 10
+offset_left = -423.0
+offset_top = -1064.0
+offset_right = 722.0
+offset_bottom = -403.0
+theme = ExtResource("1_2eo1p")
+theme_override_colors/font_color = Color(0.76862746, 0.7607843, 0.91764706, 1)
+theme_override_font_sizes/font_size = 60
+text = "I am driving on the inner-state.
+
+a tractor trailer is on fire. 
+
+Someone else already stopped to help. 
+
+I keep driving."
+
+[node name="ColorRect" type="ColorRect" parent="."]
+custom_minimum_size = Vector2(7000, 4000)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.78250223, 0.58254534, 0.7029052, 1)

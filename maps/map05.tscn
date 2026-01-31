@@ -55,13 +55,9 @@ position = Vector2(845, -32)
 position = Vector2(1122, -30)
 Platform = NodePath("../elevator_platform")
 
-[node name="Node2D" type="Node2D" parent="interactables/debris7"]
-
 [node name="debris8" parent="interactables" node_paths=PackedStringArray("Platform") instance=ExtResource("8_lr3uk")]
 position = Vector2(544, -32)
 Platform = NodePath("../elevator_platform")
-
-[node name="Node2D" type="Node2D" parent="interactables/debris8"]
 
 [node name="unbreakable_debris5" parent="interactables" instance=ExtResource("9_e848q")]
 z_index = 3

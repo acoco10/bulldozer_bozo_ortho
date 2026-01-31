@@ -1,6 +1,6 @@
 [gd_resource type="Theme" load_steps=2 format=3 uid="uid://d3777wnxr81vv"]
 
-[ext_resource type="FontFile" uid="uid://bqkypnl1mwuqp" path="res://PixelOperator.ttf" id="1_bqwt3"]
+[ext_resource type="FontFile" uid="uid://bqkypnl1mwuqp" path="res://fonts/PixelOperator.ttf" id="1_bqwt3"]
 
 [resource]
 default_base_scale = 1.0

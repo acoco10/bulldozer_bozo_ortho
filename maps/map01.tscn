@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=4 uid="uid://cf2hlgax6unsa"]
+[gd_scene load_steps=11 format=4 uid="uid://cf2hlgax6unsa"]
 
 [ext_resource type="Script" uid="uid://uhiewv2g8r22" path="res://maps/map.gd" id="1_oehuw"]
 [ext_resource type="Script" uid="uid://dw7t4me0c08sg" path="res://maps/tilemapController.gd" id="2_rmgji"]
@@ -9,13 +9,15 @@
 [ext_resource type="PackedScene" uid="uid://djhiip3tgbaow" path="res://elevator_platform.tscn" id="7_qy5r5"]
 [ext_resource type="PackedScene" uid="uid://cscul4aciwrgd" path="res://debrisBig.tscn" id="8_krvmg"]
 [ext_resource type="Script" uid="uid://dlb80q1ci0ut5" path="res://maps/player_start.gd" id="9_3ggav"]
+[ext_resource type="PackedScene" uid="uid://cthhej3a06o5k" path="res://button.tscn" id="9_rmgji"]
 
-[node name="map1" type="Node2D" node_paths=PackedStringArray("Player_start_pos", "elevator_platform", "ent_grid")]
+[node name="map1" type="Node2D" node_paths=PackedStringArray("Player_start_pos", "elevator_platform", "ent_grid", "button")]
 script = ExtResource("1_oehuw")
 Player_start_pos = NodePath("Marker2D")
 elevator_platform = NodePath("interactables/elevator_platform")
 timeLimitMinutes = 60
 ent_grid = NodePath("interactables")
+button = NodePath("interactables/button")
 
 [node name="tilemap" type="Node2D" parent="."]
 script = ExtResource("2_rmgji")
@@ -43,12 +45,17 @@ script = ExtResource("5_d13hd")
 
 [node name="interactables" type="Node2D" parent="." node_paths=PackedStringArray("lava", "land")]
 z_index = 1
+z_as_relative = false
 script = ExtResource("6_dxypy")
 lava = NodePath("../tilemap/fences")
 land = NodePath("../tilemap/tiles")
 
-[node name="elevator_platform" parent="interactables" instance=ExtResource("7_qy5r5")]
-position = Vector2(845, -32)
+[node name="button" parent="interactables" instance=ExtResource("9_rmgji")]
+z_index = 2
+z_as_relative = false
+position = Vector2(854, 31)
+change_z_to_on_enter = 1
+enter_with_elevator = true
 
 [node name="debris7" parent="interactables" node_paths=PackedStringArray("Platform") instance=ExtResource("8_krvmg")]
 position = Vector2(544, -30)
@@ -57,6 +64,10 @@ Platform = NodePath("../elevator_platform")
 [node name="debris8" parent="interactables" node_paths=PackedStringArray("Platform") instance=ExtResource("8_krvmg")]
 position = Vector2(609, -30)
 Platform = NodePath("../elevator_platform")
+
+[node name="elevator_platform" parent="interactables" instance=ExtResource("7_qy5r5")]
+z_index = 1
+position = Vector2(845, -32)
 
 [node name="Marker2D" type="Marker2D" parent="."]
 position = Vector2(785, -21)

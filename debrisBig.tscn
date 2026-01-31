@@ -1,14 +1,16 @@
 [gd_scene load_steps=3 format=3 uid="uid://cscul4aciwrgd"]
 
 [ext_resource type="Script" uid="uid://bsyt5y1nlei3a" path="res://scripts/entities/debris.gd" id="1_1woht"]
-[ext_resource type="Texture2D" uid="uid://cq43rs7j3srme" path="res://art/debris.png" id="1_16lko"]
+[ext_resource type="Texture2D" uid="uid://dmo73hrq4cf7" path="res://art/interactable_objects/debris.png" id="1_16lko"]
 
 [node name="debris" type="Node2D"]
-y_sort_enabled = true
+z_index = 2
+z_as_relative = false
 script = ExtResource("1_1woht")
 breakable = true
 mineral = true
 texture_path_name = "debris"
+change_z_to_on_enter = 2
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("1_16lko")

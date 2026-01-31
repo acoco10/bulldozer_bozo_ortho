@@ -23,13 +23,13 @@ var canned_animation: bool = false
 @export var enter_with_elevator: bool 
 
 
-var debris_animator: DebrisAnimator = DebrisAnimator.new()
 var broken_up_texture: Texture
 var unbroken_texture: Texture
 var move_speed = 10
 var free_after_move: bool 
-var last_turn_result: DebrisAction
 
+func take_turn():
+	pass
 
 func initialize_shape(type: ShapeType) -> void:
 	shape_type = type

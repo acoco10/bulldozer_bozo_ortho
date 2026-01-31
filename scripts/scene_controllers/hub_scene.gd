@@ -5,10 +5,10 @@ enum results_state {Retry_Token_Used, Continue, Continue_Death}
 
 @onready var dozerScene = $dozer
 @onready var canvas_layer = $CanvasLayer
-@onready var contract = $CanvasLayer/contract
 @onready var results = $CanvasLayer/results_panel
 @onready var entrance = $entrance
 @onready var new_life_menu = $CanvasLayer/new_life
+@onready var clone_thoughts = $CanvasLayer/clone_thoughts_scene
 
 
 var state_from_results: results_state
@@ -102,15 +102,19 @@ func untrigger_dozer_scene() -> void:
 	dozerScene.process_mode = PROCESS_MODE_DISABLED
 	
 func trigger_results_scene() -> void:
-	results.on_enter(base_citizen_number)
+	results.on_enter()
 	results.process_mode = Node.PROCESS_MODE_INHERIT
 	results.visible = true 
 
 func untrigger_results_scene() -> void:
 	results.process_mode = Node.PROCESS_MODE_DISABLED
-	results.visible = false
+	results.visible = false	
+	
 
 func trigger_new_life_scene() -> void:
+	clone_thoughts.visible = true
+	await get_tree().create_timer(1.25).timeout
+	clone_thoughts.visible = false 
 	new_life_menu.on_enter(base_citizen_number)
 	new_life_menu.process_mode = Node.PROCESS_MODE_INHERIT
 	new_life_menu.visible = true

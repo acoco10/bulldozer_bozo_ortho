@@ -54,8 +54,8 @@ func play_scoop_animation(debris: Entity) -> void:
 	
 	play_all_animations("scoop")
 	await play_current_animation("scoop")
-	
-	debris.visible = false
+	if debris != null:
+		debris.visible = false
 
 # Play release animation and show debris at the right frame
 func play_release_animation() -> void:

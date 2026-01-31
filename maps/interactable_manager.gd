@@ -4,9 +4,10 @@ var entities: Dictionary[Vector2i, Entity] = {}
 @export var lava: TileMapLayer
 @export var land: TileMapLayer
 
+
 func _ready():
 	register_scene_entities(self)
-	
+
 func register_scene_entities(input: Node2D):
 	for child in input.get_children():
 		if child is Entity:
@@ -21,7 +22,10 @@ func register(entity: Entity):
 	entity.tree_exiting.connect(func(): unregister(entity))
 
 func unregister(entity: Entity):
-	entities.erase(entity.grid_pos)
+	if !has_entity_at(entity.grid_pos):
+		return
+	if entities[entity.grid_pos] == entity:
+		entities.erase(entity.grid_pos)
 
 func get_debris_at(pos: Vector2i) -> Debris:
 	var get_ent = entities.get(pos)
@@ -150,6 +154,11 @@ func move(entity: Entity, new_pos: Vector2i):
 	if get_debris_at(entity.grid_pos) == entity:
 		#only erase last position entity is registered at that position 
 		entities.erase(entity.grid_pos)
+		
+	if has_entity_at(new_pos):
+		var but_check = entities[new_pos] as elevator_button
+		if but_check != null:
+			but_check.press()
 	entity.grid_pos = new_pos
 	entities[new_pos] = entity
 	set_visual_targ_to_new_grid_pos(entity)
@@ -165,7 +174,6 @@ func recombine_debris(existing: Debris, moving: Debris):
 	existing.pushable = false
 	unregister(moving)		
 	register(existing)
-
 	moving.queue_free()
 
 func has_solid_debris_at(pos: Vector2i) -> bool:
@@ -185,7 +193,8 @@ func flash_and_free(entity: Node2D, flash_count: int = 3, flash_duration: float 
 			tween.tween_property(entity, "modulate:a", 1.0, flash_duration)
 		
 		await tween.finished
-		entity.queue_free()
+		if entity != null:
+			entity.queue_free()
 		
 func flash(entity: Node2D, flash_count: int = 3, flash_duration: float = 0.3):
 	var tween = create_tween()
@@ -254,6 +263,8 @@ func break_up_debris(debris: Debris, push_direction: DirectionalCharacter.Facing
 		move(debris, new_pos)
 		debris.visual_pos = original_visual_pos  # Reset to start position
 		
+			
+		
 func resolve_entity_interaction_with_player(player: DirectionalCharacter, target: Vector2i, new_facing: DirectionalCharacter.Facing) -> bool:
 	var debris_at_targ = get_debris_at(target)
 	if debris_at_targ == null:
@@ -306,9 +317,8 @@ func release_scooped_debris(scooped_debris: Entity, release_pos: Vector2i, direc
 			return true
 		else:
 			# Try to push the existing debris
-			if push_debris(existing, direction, false):
+			if push_debris(scooped_debris, direction, false):
 				# Push succeeded, place scooped debris
-				scooped_debris.grid_pos = release_pos
 				register(scooped_debris)
 				set_visual_targ_to_new_grid_pos(scooped_debris)
 				return true
@@ -321,3 +331,26 @@ func release_scooped_debris(scooped_debris: Entity, release_pos: Vector2i, direc
 		register(scooped_debris)
 		set_visual_targ_to_new_grid_pos(scooped_debris)
 		return true
+
+
+func trigger_elevator_leave(current_map_elevator: Elevator, player: DirectionalCharacter):
+	print("triggering leave animation")
+	var debris_to_reparent = []
+	for debris_pos in entities:
+		if !current_map_elevator.occupies(debris_pos):
+			continue
+		var but_check = entities[debris_pos] as elevator_button
+		if but_check != null:
+			debris_to_reparent.append(but_check)
+		
+		var debris = entities[debris_pos] as Debris
+		if debris == null:
+			continue
+		debris_to_reparent.append(debris)
+		
+
+	for debris in debris_to_reparent:
+		debris.canned_animation = true
+		debris.reparent(current_map_elevator)
+		debris.reparent(current_map_elevator)
+	current_map_elevator.trigger_leave(player)

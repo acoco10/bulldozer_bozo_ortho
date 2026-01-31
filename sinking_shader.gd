@@ -1,6 +1,6 @@
 extends AnimatedSprite2D
 var sink_progress: float = 0.0
-var shader_tween: Tween = Tween.new()
+var shader_tween: Tween = create_tween()
 
 func _ready() -> void:
 	material = ShaderMaterial.new()

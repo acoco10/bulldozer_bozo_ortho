@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://dbwfnkk03wmhr"]
 
-[ext_resource type="Script" uid="uid://bpe8bii3yyp5h" path="res://countdown_menu.gd" id="1_d7yqa"]
+[ext_resource type="Script" uid="uid://bpe8bii3yyp5h" path="res://scripts/countdown_menu.gd" id="1_d7yqa"]
 [ext_resource type="Theme" uid="uid://bp5vfv8jgvon8" path="res://maps/contract_them.tres" id="2_vr4xf"]
 
 [node name="Control" type="Control"]

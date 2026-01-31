@@ -5,11 +5,11 @@ extends Node2D
 @onready var land_tiles = $tilemap/tiles
 @export var Player_start_pos: Marker2D
 @export var elevator_platform: Node2D
-@export var leave_button: Button_Tile
 @export var timeLimitMinutes: int
 @export var timeLimitHours: int
 @export var n_minerals: int
 @export var ent_grid: EntityGrid
+@export var button: elevator_button
 
 
 const LAVA_ATLAS_COORDS = Vector2i(4, 0)
@@ -56,3 +56,11 @@ func advance_lava(probability_of_lava: float = 1.0):
 	for tile_pos in tiles_to_convert:
 		fences.set_cell(tile_pos, 0, LAVA_ATLAS_COORDS)
 	fences.add_new_lava(tiles_to_convert)
+	
+
+func leave():
+	var tween = create_tween()
+	tween.set_ease(Tween.EASE_OUT)
+	var final_position = global_position + Vector2(0, 1000)
+	tween.tween_property(self, "global_position", final_position, 2)
+	

@@ -1,6 +1,6 @@
 [gd_resource type="Theme" load_steps=8 format=3 uid="uid://bp5vfv8jgvon8"]
 
-[ext_resource type="FontFile" uid="uid://bqkypnl1mwuqp" path="res://PixelOperator.ttf" id="1_tbpfx"]
+[ext_resource type="FontFile" uid="uid://bqkypnl1mwuqp" path="res://fonts/PixelOperator.ttf" id="1_tbpfx"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_tbpfx"]
 

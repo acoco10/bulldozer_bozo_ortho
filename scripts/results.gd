@@ -1,6 +1,7 @@
 extends Control
 
-signal next_day
+signal Continue
+signal Retry
 
 @onready var feed_back_text = $results_panel/MarginContainer/VBoxContainer/feedback_text
 @onready var rank = $results_panel/MarginContainer/VBoxContainer/rank
@@ -30,17 +31,27 @@ var lost: bool
 
 var demerits: int
 var retry_tokens: int 
+
+var new_token_flash: Tween
 const CYCLE_DURATION = 1.0  # 1 second
 
-signal Continue
-signal Retry
-
-func on_enter(citizen_number_updated: int):
+func on_enter():
 	pass
 func _ready() -> void:
-	continue_button.pressed.connect(func(): Continue.emit())
-	retry_token_button.pressed.connect(func(): Retry.emit())
+	continue_button.pressed.connect(on_continue)
+	retry_token_button.pressed.connect(on_retry)
 
+func on_continue():
+	if new_token_flash != null: 
+		new_token_flash.kill()
+	Continue.emit()
+	
+func on_retry():
+	if new_token_flash.is_running():
+		new_token_flash.kill()
+	Retry.emit() 
+	update_sprite_array(retry_token_sprites, retry_tokens -1, false)
+	
 func _process(delta: float) -> void:
 	if is_cycling:
 		cycle_timer -= delta
@@ -107,6 +118,7 @@ func update_results(data: Dictionary, citizen_number_current: int):
 	cycle_timer = CYCLE_DURATION
 	rank.start_cycling()		
 
+
 func update_citizen_number(citizen_number: int):
 	rank_feedback["A"] = "Excellent Work Citizen #%d! You have been awarded a retry token for your outstanding performance." % citizen_number
 	if retry_tokens == 3:
@@ -119,8 +131,8 @@ func update_citizen_number(citizen_number: int):
 func focus_button():
 	buttons[but_index].grab_focus()
 
-func get_rank_message(rank: String) -> String:
-	return rank_feedback.get(rank, "Error: Invalid Rank")
+func get_rank_message(calced_rank: String) -> String:
+	return rank_feedback.get(calced_rank, "Error: Invalid Rank")
 
 
 func _on_end_rank_cycle():
@@ -173,13 +185,12 @@ func update_sprite_array(sprites: Array, max_revealed: int, new: bool):
 	return sprites
 	
 
-func flash(entity: Node2D, flash_count: int = 5, flash_duration: float = 0.3):
+func flash(entity: Node2D, flash_count: int = 10, flash_duration: float = 0.3):
 	print("calling ui flash function")
-	var tween = create_tween()
-		
+	new_token_flash = create_tween()
 	for i in flash_count:
-		tween.tween_property(entity, "modulate:a", 0.0, flash_duration)
-		tween.tween_property(entity, "modulate:a", 1.0, flash_duration)
+		new_token_flash.tween_property(entity, "modulate:a", 0.0, flash_duration)
+		new_token_flash.tween_property(entity, "modulate:a", 1.0, flash_duration)
 		
 func get_time_string(remaining_minutes) -> String:
 	var hours = remaining_minutes / 60
