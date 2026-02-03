@@ -1,0 +1,35 @@
+- I burned the roof of my mouth. The dentist comments on it. I cannot speak. His hands inhabit my mouth.
+- My hair hurts where it meets my scalp from wearing my hat all day.
+- I am at home. War has broken out. My daughter is dead.
+- I am going fishing, I have caught something. I remove the hook from its mouth. The fish swims away
+- I am dreaming, I cannot scream.
+- I am walking in the cold, I forgot my chapstick.
+- I reach for her hand, she pulls away.
+- I rest in his arms.
+- I am driving on the inner-state.A tractor trailer is on fire. Someone else is stopping to help. I keep driving.
+- I am an organism made of cells.
+- The cold air stings my lungs, I am happy.
+- I am in the bathroom. I am throwing up light beer. I taste failure.
+- I ask the screen questions, it responds. The screen agrees with me.
+- My Grandpa is dead, my dad is crying. I try as hard as I can to cry too.
+- The Doctor's office called. Its good news. I am happy
+- I am asking the professor to be my reference.
+- I am on a train to Boston.
+- I am at the book store. I am trying to find a gift for my mother.
+- I am outside. My father is cutting down a Christmas tree. There is hot chocolate.
+- I open the application on my telephone. I have no messages.
+- I am getting off the plane, my dad is waiting for me.
+- It's the first day of High School. I look for a familiar face. I try not to look like I am looking at anything. I am cool.
+- I am outside. It is summer. My brother crushed a fire fly. Its insides still glow.
+- We are driving across the country. I am sitting in the back seat. I am looking at women wearing bikinis on my telephone.
+- It is a holiday. My sister is crying.
+- I am cleaning the lawn mower. The clumps of grass are damp warm from the engine. My hands are green.
+- "I am looking in the mirror. I don't like the shape of my knees."
+- I am with my friend playing on the stairs. He has a hang nail. He asks for nail scissors. We keep playing. 
+- I am making a poster. My letters are too big. There is no room left for me to finish my words. 
+- I am in the kitchen. My girlfriend is making me a collage at the table. She is wearing gym shorts and a sports bra. She is smiling to herself.
+- I am crying. He asks if he thinks we are happy. I do not feel happy.
+- I am walking through the city. There is a dead bird on the road. I imagine eating it. I try not to.
+- I am inside someone else's home. It is my child's birthday.
+- There is no where to run. 
+- I cannot make change. Nothing will change. Nothing will change. Nothing will change.

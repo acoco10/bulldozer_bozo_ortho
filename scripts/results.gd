@@ -21,8 +21,7 @@ var rank_feedback = {
 
 var demerit_msg = "Maximum demerits recieved. Thank you for your service Citizen #9243"
 
-var death_msg = "Citizen #9243 expired on mission, 
-outstanding."
+var death_msg = "Citizen #9243 expired on mission"
 # Track if rank is currently cycling
 var is_cycling = false
 var calculated_rank = ""
@@ -74,6 +73,8 @@ func update_results(data: Dictionary, citizen_number_current: int):
 	retry_tokens = data["retry_tokens"]
 	calculated_rank = data["rank"]
 	
+
+
 	if retry_tokens == 0:
 		retry_token_button.disabled = true 
 	else:
@@ -185,7 +186,7 @@ func update_sprite_array(sprites: Array, max_revealed: int, new: bool):
 	return sprites
 	
 
-func flash(entity: Node2D, flash_count: int = 10, flash_duration: float = 0.3):
+func flash(entity: Node2D, flash_count: int = 2, flash_duration: float = 0.3):
 	print("calling ui flash function")
 	new_token_flash = create_tween()
 	for i in flash_count:

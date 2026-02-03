@@ -17,7 +17,7 @@ var current_fences_map: TileMapLayer
 var current_ent_grid: EntityGrid
 
 var best_turns: int = 0 
-var turns: int = 1 
+var turns: int = 2
 var elevator_countdown: int = -1
 
 var died: bool = false 
@@ -35,7 +35,6 @@ var turn_data: Array
 
 @onready var turn_timer = $timer
 
-
 signal new_map_instance(player_start_pos:Vector2i)
 signal player_finished
 
@@ -50,9 +49,9 @@ func _ready() -> void:
 				if scene:
 					maps.append(scene)		
 					
-	load_cur_map()
+	load_cur_map(false)
 
-func load_cur_map():
+func load_cur_map(retry: bool):
 	print("loading map: %d" %map_index)
 	n_uncleared_debris = 0 
 	if current_map_node:
@@ -62,19 +61,22 @@ func load_cur_map():
 	current_ent_grid = current_map_node.ent_grid
 	current_map = current_map_node.get_node("tilemap").get_node("tiles")
 	map_index += 1 
-	new_map_instance.emit({"player_pos":current_map_node.Player_start_pos.global_position, "facing":current_map_node.Player_start_pos.Direction})
+	var data = {"player_pos":current_map_node.Player_start_pos.global_position, 
+					"facing":current_map_node.Player_start_pos.Direction, 
+					"retry": retry}
+	new_map_instance.emit(data)
 	current_fences_map = current_map_node.fences
 	
 	configure_map_entities()
 	
-	current_map_node._enter_map_scene()
+	current_map_node._enter_map_scene(retry)
 	best_turns = load_best_score(current_map_node.name)	
 	timeTracker.visible = true 
 	turn_timer.set_countdown_length(current_map_node.timeLimitHours * 60 + current_map_node.timeLimitMinutes)
 	update_text(turn_timer.get_time_string())
 	
-	if current_map_node.button != null: 
-		current_map_node.button.connect("button_press", elevator_called)
+	if current_map_node.ent_grid.button != null: 
+		current_map_node.ent_grid.button.connect("button_press", elevator_called)
 		
 func elevator_called():
 	ready_to_leave = true 
@@ -89,30 +91,28 @@ func leave_scene():
 	turns = 0 
 
 func reset_demerits():
-		demerits = 0 
+	demerits = 0 
 		
 func enter_scene(retry: bool):
 	died = false 
 	if retry:
-		map_index-=1 
+		map_index = max(1, map_index-1)
 	else:
 		Day += 1 
 		current_contract +=1 
 		
 	n_uncleared_debris = 0 
-	load_cur_map()
+	load_cur_map(retry)
 	cleanedDebris = 0 
 
-func process_turn_after_animations(delta: float) -> void:
-	var still_resolving = false 
+func _process(_delta: float) -> void:
 	for ent_pos in current_ent_grid.entities:
 		if current_ent_grid.has_entity_at(ent_pos):
 			var ent = current_ent_grid.entities[ent_pos]
 			if ent.is_moving:
-				still_resolving = true
-	if still_resolving:
-		return 
-	if ready_to_leave and player.is_moving == false: 
+				print("ent is still completeing animation")
+				return 
+	if ready_to_leave and !player.is_moving: 
 		ready_to_leave = false 
 		trigger_leave_scene()
 		
@@ -126,7 +126,6 @@ func check_if_all_mineral_on_platform() -> bool:
 	return true
 	
 func take_turn() -> bool: 
-	TurnTracker.init()
 	update_text(turn_timer.get_time_string())
 	var player_reached_elevator = current_map_node.elevator_platform.occupies(player.grid_pos)
 	if turn_timer.current_minutes == 5:
@@ -136,13 +135,7 @@ func take_turn() -> bool:
 			died = true 
 			queue_ready_to_leave()
 			return false 
-	if check_if_all_mineral_on_platform() and player_reached_elevator:		
-			queue_ready_to_leave()
-			return false
 	if turn_timer.current_minutes == 0:
-		if current_map_node.elevator_platform.occupies(player.grid_pos):
-			queue_ready_to_leave()
-			return false
 		current_map_node.advance_lava(0.15)
 	turn_timer.advance_time()
 	

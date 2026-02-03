@@ -1,7 +1,6 @@
 extends Node2D
 
-
-signal leave_scene
+signal Leave
 
 func _ready() -> void:
 	for child in get_children():
@@ -24,4 +23,4 @@ func _unhandled_input(event: InputEvent) -> void:
 				
 				
 		await get_tree().create_timer(1.0).timeout
-		leave_scene.emit()
+		Leave.emit()

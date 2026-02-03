@@ -5,7 +5,7 @@ signal button_press
 var pressed: bool = false
 
 func _ready() -> void:
-	super._ready()
+	pass
 
 func press():
 	if !pressed:

@@ -5,15 +5,12 @@ extends Node2D
 @onready var time_ui: countdown_ui = $CanvasLayer/countdown_ui
 
 signal end_of_day(debris_harvested: int, debris_available: int, time_remaining_minutes: int, lost: bool)
-signal reset
-
 const max_demerits = 2 
 
 func _ready() -> void:
 	gTrack.connect("player_finished", _on_day_finished)
 	
 func _on_day_finished():
-	
 	time_ui.visible = false 
 	print("dozer scene publishing end of day")
 	await get_tree().create_timer(1.6).timeout
@@ -22,6 +19,7 @@ func _on_day_finished():
 	var days_rank = calc_rank()
 	var demerit_loss: bool
 	var too_mid: bool 
+	var all_puzzles = gTrack.map_index >= gTrack.maps.size() and !gTrack.died
 	match days_rank:
 		"C":
 			gTrack.demerits +=1 
@@ -46,38 +44,36 @@ func _on_day_finished():
 					"demerits": gTrack.demerits,
 					"rank": days_rank,
 					"retry_tokens": gTrack.retry_tokens,
-					"too_mid": too_mid})
+					"too_mid": too_mid,
+					"win": all_puzzles})
 	
 func on_enter(results_state: Hub_Scene_Controller.results_state):
 	match results_state:
 		Hub_Scene_Controller.results_state.Retry_Token_Used:
 			print("entering dozer scene after using retry token")
 			gTrack.enter_scene(true)
-			gTrack.retry_tokens -=1 
+			gTrack.retry_tokens = max(0, gTrack.retry_tokens-1)
 		Hub_Scene_Controller.results_state.Continue_Death:
 			print("entering dozer scene after death")
 			gTrack.enter_scene(true)
 		Hub_Scene_Controller.results_state.Continue:
 			print("entering dozer scene normally")
 			gTrack.enter_scene(false)
+		Hub_Scene_Controller.results_state.Reset_Death:
+			gTrack.enter_scene(true)
 		
 		
-	if gTrack.map_index >= gTrack.maps.size():
-		reset.emit()
-		return
+	
 	$CanvasLayer.visible = true 
 	
 func first_enter():
 	$CanvasLayer.visible = true 
 
-func _unhandled_input(event: InputEvent) -> void:
-	if event is InputEventKey:
-		if event.key_label == KEY_R:
-			gTrack.enter_scene(true)
-			
+func _unhandled_input(event: InputEvent) -> void:			
 	if event is InputEventKey:
 		if event.key_label == KEY_Z:
 			gTrack.turn_timer.set_countdown_to_1()
+			
 func calc_rank() -> String:
 	var calculated_rank = ""
 	
@@ -96,7 +92,7 @@ func calc_rank() -> String:
 		print("  Perfect clear (uncleared == cleaned)")
 		calculated_rank = "A"
 	else:
-		var ratio = float(gTrack.n_uncleared_debris) / float(gTrack.cleanedDebris)
+		var ratio =  float(gTrack.cleanedDebris)/ float(gTrack.n_uncleared_debris)
 		print("  Ratio: ", ratio)
 		if ratio >= 0.8:
 			calculated_rank = "B"

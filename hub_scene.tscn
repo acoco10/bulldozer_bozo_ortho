@@ -1,13 +1,15 @@
-[gd_scene load_steps=10 format=3 uid="uid://bj4exhrrgl0yw"]
+[gd_scene load_steps=12 format=3 uid="uid://bj4exhrrgl0yw"]
 
 [ext_resource type="Script" uid="uid://bgi8ofk5e5ml5" path="res://scripts/scene_controllers/hub_scene.gd" id="1_x1i88"]
 [ext_resource type="PackedScene" uid="uid://ddud80ucw526r" path="res://opening_scene.tscn" id="2_551ry"]
 [ext_resource type="PackedScene" uid="uid://cuak7ht6h87n0" path="res://mediocre_screen.tscn" id="2_rcx7m"]
 [ext_resource type="Shader" uid="uid://by47ysoslr2p2" path="res://shaders/screen_wipe.gdshader" id="3_551ry"]
+[ext_resource type="PackedScene" uid="uid://c3b0q2g56tgmd" path="res://winning_scene.tscn" id="3_lywxq"]
 [ext_resource type="PackedScene" uid="uid://b4koex2j17meo" path="res://results.tscn" id="3_rcx7m"]
 [ext_resource type="PackedScene" uid="uid://t3kyqjk80ooe" path="res://after_death_menu.tscn" id="3_x1i88"]
 [ext_resource type="PackedScene" uid="uid://cxfcykben3ydb" path="res://dozer.tscn" id="6_x1i88"]
 [ext_resource type="PackedScene" uid="uid://brtq1lf3ppscp" path="res://clone_wake_up.tscn" id="7_ukudq"]
+[ext_resource type="PackedScene" uid="uid://vsngdrm1mrnk" path="res://death_scene.tscn" id="9_j3xg2"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_x1i88"]
 shader = ExtResource("3_551ry")
@@ -24,11 +26,19 @@ z_index = 10
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 follow_viewport_enabled = true
 
-[node name="mediocrity_ending" parent="CanvasLayer" instance=ExtResource("2_rcx7m")]
+[node name="winning_scene" parent="CanvasLayer" instance=ExtResource("3_lywxq")]
+visible = false
+position = Vector2(2261, 1780)
+
+[node name="mediocrity_loss_scene" parent="CanvasLayer" instance=ExtResource("2_rcx7m")]
 visible = false
 z_index = 100
 z_as_relative = false
 position = Vector2(1883, 1855)
+
+[node name="deaths_loss_scene" parent="CanvasLayer" instance=ExtResource("9_j3xg2")]
+visible = false
+position = Vector2(1883, 1865)
 
 [node name="new_life" parent="CanvasLayer" instance=ExtResource("3_x1i88")]
 visible = false

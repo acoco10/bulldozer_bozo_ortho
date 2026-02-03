@@ -1,9 +1,9 @@
 [gd_scene load_steps=9 format=4 uid="uid://ddud80ucw526r"]
 
 [ext_resource type="TileSet" uid="uid://bydf6q7xrag3d" path="res://dozer.tres" id="1_60xhg"]
+[ext_resource type="Script" uid="uid://df4vyby2yoki8" path="res://entrance.gd" id="1_n0ess"]
 [ext_resource type="Theme" uid="uid://bp5vfv8jgvon8" path="res://maps/contract_them.tres" id="2_n0ess"]
-[ext_resource type="Texture2D" uid="uid://v4m53fj8y" path="res://art/chain_descend.png" id="2_x7dql"]
-[ext_resource type="Script" uid="uid://pt6p2renjhq1" path="res://play_all.gd" id="3_etrj5"]
+[ext_resource type="Texture2D" uid="uid://v4m53fj8y" path="res://art/story/chain_descend.png" id="2_x7dql"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_n0ess"]
 atlas = ExtResource("2_x7dql")
@@ -35,7 +35,7 @@ animations = [{
 }]
 
 [node name="Node2D" type="Node2D"]
-script = ExtResource("3_etrj5")
+script = ExtResource("1_n0ess")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(329, 72)
@@ -419,9 +419,10 @@ frame_progress = 0.303326
 follow_viewport_enabled = true
 
 [node name="Label" type="Label" parent="CanvasLayer"]
-offset_left = 245.0
-offset_top = -32.0
-offset_right = 490.0
-offset_bottom = 48.0
+offset_left = 108.0
+offset_top = -65.0
+offset_right = 503.0
+offset_bottom = 98.0
 theme = ExtResource("2_n0ess")
-text = "Descend"
+text = "Rat in a Cage
+"

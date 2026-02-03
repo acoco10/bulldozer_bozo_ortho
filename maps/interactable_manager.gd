@@ -3,7 +3,7 @@ class_name EntityGrid extends Node2D
 var entities: Dictionary[Vector2i, Entity] = {}
 @export var lava: TileMapLayer
 @export var land: TileMapLayer
-
+@export var button: elevator_button
 
 func _ready():
 	register_scene_entities(self)
@@ -339,18 +339,14 @@ func trigger_elevator_leave(current_map_elevator: Elevator, player: DirectionalC
 	for debris_pos in entities:
 		if !current_map_elevator.occupies(debris_pos):
 			continue
-		var but_check = entities[debris_pos] as elevator_button
-		if but_check != null:
-			debris_to_reparent.append(but_check)
-		
 		var debris = entities[debris_pos] as Debris
 		if debris == null:
 			continue
 		debris_to_reparent.append(debris)
-		
-
+	if button != null:
+		debris_to_reparent.append(button)
+	await get_tree().create_timer(0.5).timeout
 	for debris in debris_to_reparent:
 		debris.canned_animation = true
-		debris.reparent(current_map_elevator)
 		debris.reparent(current_map_elevator)
 	current_map_elevator.trigger_leave(player)

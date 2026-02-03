@@ -1,11 +1,11 @@
-[gd_scene load_steps=4 format=3 uid="uid://cuak7ht6h87n0"]
+[gd_scene load_steps=4 format=3 uid="uid://vsngdrm1mrnk"]
 
-[ext_resource type="Script" uid="uid://ccmt4xn6p7g0h" path="res://end_scene.gd" id="1_0kfj7"]
-[ext_resource type="Texture2D" uid="uid://1r78h2pn2r17" path="res://art/story/you_lose.png" id="2_4lnlf"]
-[ext_resource type="Theme" uid="uid://bp5vfv8jgvon8" path="res://maps/contract_them.tres" id="2_tert1"]
+[ext_resource type="Script" uid="uid://ccmt4xn6p7g0h" path="res://end_scene.gd" id="1_fxiyg"]
+[ext_resource type="Theme" uid="uid://bp5vfv8jgvon8" path="res://maps/contract_them.tres" id="1_y2fqr"]
+[ext_resource type="Texture2D" uid="uid://1r78h2pn2r17" path="res://art/story/you_lose.png" id="2_fxiyg"]
 
 [node name="Node2D" type="Node2D"]
-script = ExtResource("1_0kfj7")
+script = ExtResource("1_fxiyg")
 
 [node name="ColorRect" type="ColorRect" parent="."]
 custom_minimum_size = Vector2(7000, 4000)
@@ -14,7 +14,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.27058825, 0.12156863, 0.20784314, 1)
+color = Color(0.27567393, 0.018643266, 0.057076313, 1)
 
 [node name="Panel" type="Panel" parent="."]
 custom_minimum_size = Vector2(1000, 400)
@@ -29,21 +29,22 @@ offset_right = 311.0
 offset_bottom = -9.0
 grow_horizontal = 2
 grow_vertical = 0
-theme = ExtResource("2_tert1")
+theme = ExtResource("1_y2fqr")
 
 [node name="Label" type="Label" parent="Panel"]
 layout_mode = 0
-offset_left = 84.0
-offset_top = 82.0
-offset_right = 1229.0
-offset_bottom = 743.0
+offset_left = 81.0
+offset_top = 66.0
+offset_right = 1226.0
+offset_bottom = 727.0
 theme_override_colors/font_color = Color(0.76862746, 0.7607843, 0.91764706, 1)
 theme_override_font_sizes/font_size = 60
-text = "This department is producing 
-nothing but mediocre results. 
-Shut it down. "
+text = "Some liberal rag published
+a picture of the overflowing Clone 
+Corpse Disposal Unit (CCDU).
+We need to shut this program down. "
 
 [node name="YouLose" type="Sprite2D" parent="."]
 position = Vector2(2, -900)
 scale = Vector2(4, 4)
-texture = ExtResource("2_4lnlf")
+texture = ExtResource("2_fxiyg")

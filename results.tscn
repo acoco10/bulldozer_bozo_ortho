@@ -61,33 +61,36 @@ theme_override_constants/separation = 66
 
 [node name="RetryToken" type="Sprite2D" parent="results_panel/MarginContainer/VBoxContainer/HBoxContainer"]
 visible = false
+z_index = 10
 position = Vector2(-30.5, 226.5)
 scale = Vector2(2, 2)
 texture = ExtResource("4_ph8o5")
 
 [node name="RetryToken2" type="Sprite2D" parent="results_panel/MarginContainer/VBoxContainer/HBoxContainer"]
 visible = false
-position = Vector2(133.5, 228.5)
+z_index = 10
+position = Vector2(133.5, 229.5)
 scale = Vector2(2, 2)
 texture = ExtResource("4_ph8o5")
 
 [node name="RetryToken3" type="Sprite2D" parent="results_panel/MarginContainer/VBoxContainer/HBoxContainer"]
 visible = false
-position = Vector2(296.5, 227.5)
+z_index = 10
+position = Vector2(295.5, 228.5)
 scale = Vector2(2, 2)
 texture = ExtResource("4_ph8o5")
 
 [node name="Demerit" type="Sprite2D" parent="results_panel/MarginContainer/VBoxContainer/HBoxContainer"]
 visible = false
 z_index = 10
-position = Vector2(-26.5, 57)
+position = Vector2(-26.5, 58.5)
 scale = Vector2(2, 2)
 texture = ExtResource("5_7jyyn")
 
 [node name="Demerit2" type="Sprite2D" parent="results_panel/MarginContainer/VBoxContainer/HBoxContainer"]
 visible = false
 z_index = 10
-position = Vector2(131.5, 55.5)
+position = Vector2(130.5, 56.5)
 scale = Vector2(2, 2)
 texture = ExtResource("5_7jyyn")
 

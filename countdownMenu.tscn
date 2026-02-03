@@ -51,7 +51,7 @@ theme = ExtResource("2_vr4xf")
 
 [node name="title" type="Label" parent="panel/MarginContainer/VBoxContainer"]
 layout_mode = 2
-text = "Time Remaining"
+text = "Turns Remaining"
 horizontal_alignment = 1
 
 [node name="time" type="Label" parent="panel/MarginContainer/VBoxContainer"]

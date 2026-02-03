@@ -15,7 +15,7 @@
 script = ExtResource("1_oehuw")
 Player_start_pos = NodePath("Marker2D")
 elevator_platform = NodePath("interactables/elevator_platform")
-timeLimitMinutes = 60
+timeLimitMinutes = 47
 ent_grid = NodePath("interactables")
 button = NodePath("interactables/button")
 
@@ -43,17 +43,18 @@ z_index = 4
 tile_set = ExtResource("3_8msc4")
 script = ExtResource("5_d13hd")
 
-[node name="interactables" type="Node2D" parent="." node_paths=PackedStringArray("lava", "land")]
+[node name="interactables" type="Node2D" parent="." node_paths=PackedStringArray("lava", "land", "button")]
 z_index = 1
 z_as_relative = false
 script = ExtResource("6_dxypy")
 lava = NodePath("../tilemap/fences")
 land = NodePath("../tilemap/tiles")
+button = NodePath("button")
 
 [node name="button" parent="interactables" instance=ExtResource("9_rmgji")]
-z_index = 2
+z_index = 3
 z_as_relative = false
-position = Vector2(854, 31)
+position = Vector2(854, 30)
 change_z_to_on_enter = 1
 enter_with_elevator = true
 
@@ -70,6 +71,6 @@ z_index = 1
 position = Vector2(845, -32)
 
 [node name="Marker2D" type="Marker2D" parent="."]
-position = Vector2(785, -21)
+position = Vector2(789, -34)
 script = ExtResource("9_3ggav")
-Direction = 1
+Direction = 2

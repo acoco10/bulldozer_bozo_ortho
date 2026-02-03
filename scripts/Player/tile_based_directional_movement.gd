@@ -66,7 +66,7 @@ func _on_new_map(data: Dictionary):
 	visual_facing = start_face
 	
 	update_animation(player_facing)
-	on_enter()	
+	on_enter(data.retry)	
 
 func _process(delta):
 	if canned_animation:
@@ -155,7 +155,13 @@ func _unhandled_input(event):
 
 	var now_facing : Facing
 	var dir = Vector2i.ZERO
-
+	if event.is_action_pressed("ui_accept"):
+		handle_backhoe_action(grid_pos, player_facing)
+		turns += 1
+		on_player_move()
+		tracker.take_turn()
+		update_animation(visual_facing)
+		return
 	if event.is_action_pressed("ui_up"):
 		now_facing = Facing.UP
 		dir = Vector2i(0, -1)
@@ -189,8 +195,7 @@ func _unhandled_input(event):
 		tracker.take_turn()
 		update_animation(visual_facing)
 
-	if event.is_action_pressed("ui_accept"):
-		handle_backhoe_action(grid_pos, player_facing)
+	
 			
 
 
@@ -223,12 +228,13 @@ func reset_player_flags():
 	times_up = false 
 
 
-func on_enter():
+func on_enter(retry: bool):
 	reset_player_flags()
 	if sink_tween.is_valid():
 		sink_tween.kill()
-	z_index = 4
-	enter_animation()
+	if !retry:
+		z_index = 4
+		enter_animation()
 	$bulldozer_sprite.play()
 	$backhoeSprites.reset()
 

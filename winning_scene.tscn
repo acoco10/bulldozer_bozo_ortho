@@ -1,0 +1,54 @@
+[gd_scene load_steps=4 format=3 uid="uid://c3b0q2g56tgmd"]
+
+[ext_resource type="Script" uid="uid://ccmt4xn6p7g0h" path="res://end_scene.gd" id="1_3w4o6"]
+[ext_resource type="Theme" uid="uid://bp5vfv8jgvon8" path="res://maps/contract_them.tres" id="1_625sc"]
+[ext_resource type="Texture2D" uid="uid://tttm838q5myx" path="res://art/story/so_much_money.png" id="2_625sc"]
+
+[node name="Node2D" type="Node2D"]
+script = ExtResource("1_3w4o6")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+custom_minimum_size = Vector2(7000, 4000)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -3877.0
+offset_top = -1924.0
+offset_right = 3123.0
+offset_bottom = 2076.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.12195871, 0.14992931, 0.014974812, 1)
+
+[node name="Panel" type="Panel" parent="."]
+custom_minimum_size = Vector2(1000, 400)
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -289.0
+offset_top = -209.0
+offset_right = 311.0
+offset_bottom = -9.0
+grow_horizontal = 2
+grow_vertical = 0
+theme = ExtResource("1_625sc")
+
+[node name="Label" type="Label" parent="Panel"]
+custom_minimum_size = Vector2(1000, 600)
+layout_mode = 0
+offset_left = 29.0
+offset_top = 36.0
+offset_right = 1174.0
+offset_bottom = 697.0
+theme_override_colors/font_color = Color(0.76862746, 0.7607843, 0.91764706, 1)
+theme_override_font_sizes/font_size = 60
+text = "We're gonna make so much money 
+from cloning  the citizen 9990 line."
+autowrap_mode = 2
+
+[node name="SoMuchMoney" type="Sprite2D" parent="."]
+position = Vector2(12, -885)
+scale = Vector2(4, 4)
+texture = ExtResource("2_625sc")

@@ -14,8 +14,6 @@ var player_parent
 var local_player: Entity
 
 func trigger_leave(current_player: DirectionalCharacter):
-	await get_tree().create_timer(0.5).timeout
-
 	local_player = current_player
 	player_parent = current_player.get_parent()
 	if occupies(local_player.grid_pos):
