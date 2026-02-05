@@ -4,6 +4,7 @@ extends Node2D
 var countdown_length: int = 270  # Default countdown in minutes (4.5 hours = 270 mins)
 var current_minutes: int = countdown_length
 
+
 func set_countdown_length(minutes: int):
 	countdown_length = minutes
 	current_minutes = minutes

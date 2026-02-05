@@ -4,13 +4,11 @@ extends Node2D
 var cleanedDebris: int
 var debris_queue: Array = []
 var n_uncleared_debris: int 
-var current_contract: int = 1
-var current_contract_finished: bool 
-var Day: int = 1 
 var debris_in_contract
 
 var maps: Array 
-var map_index: int = 1
+@export var starting_map_index: int = 0
+@export var n_tutorials: int = 7 
 var current_map: TileMapLayer
 var current_map_node: map
 var current_fences_map: TileMapLayer
@@ -28,15 +26,16 @@ var demerits: int = 0
 var retry_tokens: int = 0 
 var bs_in_a_row: int = 0 
 
-
-var turn_data: Array
 @export var timeTracker: countdown_ui
 @export var player: DirectionalCharacter
+@export var objective_ui: Training_Objective
+@onready var turn_timer: turn_based_timer = $timer
 
-@onready var turn_timer = $timer
 
-signal new_map_instance(player_start_pos:Vector2i)
+var training_mode: bool = false 
+signal new_map_instance
 signal player_finished
+signal end_of_tutorial
 
 func _ready() -> void:
 	await get_tree().create_timer(1).timeout
@@ -49,35 +48,60 @@ func _ready() -> void:
 				if scene:
 					maps.append(scene)		
 					
-	load_cur_map(false)
+	load_cur_map(true)
 
 func load_cur_map(retry: bool):
-	print("loading map: %d" %map_index)
+	print("loading map: %d" %starting_map_index)
 	n_uncleared_debris = 0 
 	if current_map_node:
+		#flush last map data 
 		current_map_node.queue_free()
-	current_map_node = maps[map_index].instantiate()
+	
+	current_map_node = maps[starting_map_index].instantiate()
 	get_parent().add_child(current_map_node)
 	current_ent_grid = current_map_node.ent_grid
 	current_map = current_map_node.get_node("tilemap").get_node("tiles")
-	map_index += 1 
-	var data = {"player_pos":current_map_node.Player_start_pos.global_position, 
-					"facing":current_map_node.Player_start_pos.Direction, 
-					"retry": retry}
+	var data: Dictionary[String, Variant] = {"player_pos":current_map_node.Player_start_pos.global_position, 
+											"facing":current_map_node.Player_start_pos.Direction, 
+											"retry": retry,
+											"map_index": starting_map_index}
 	new_map_instance.emit(data)
 	current_fences_map = current_map_node.fences
-	
-	configure_map_entities()
-	
+	configure_map_entities()	
 	current_map_node._enter_map_scene(retry)
 	best_turns = load_best_score(current_map_node.name)	
 	timeTracker.visible = true 
+	objective_ui.visible = false
 	turn_timer.set_countdown_length(current_map_node.timeLimitHours * 60 + current_map_node.timeLimitMinutes)
 	update_text(turn_timer.get_time_string())
-	
 	if current_map_node.ent_grid.button != null: 
 		current_map_node.ent_grid.button.connect("button_press", elevator_called)
+	if starting_map_index < n_tutorials:
+		training_mode = true
+		timeTracker.visible = false
+		objective_ui.visible = true
+		current_map_node.objective_completed.connect(on_objective_completed)
+		current_map_node.ent_grid.completion_flag.connect("button_press", next_objective)
+		if starting_map_index == 3:
+			$"../CanvasLayer/controls".set_control_text_reverse()
+	
+	else:
+		training_mode = false 
+		end_of_tutorial.emit()
 		
+	starting_map_index += 1 
+
+func on_objective_completed():
+	objective_ui.objective_completed()
+	current_map_node.ent_grid.completion_flag.activate()
+
+func next_objective():
+	if starting_map_index < n_tutorials:
+		load_cur_map(true)
+		objective_ui.next_objective()
+	else:
+		load_cur_map(false)
+	
 func elevator_called():
 	ready_to_leave = true 
 	
@@ -96,11 +120,7 @@ func reset_demerits():
 func enter_scene(retry: bool):
 	died = false 
 	if retry:
-		map_index = max(1, map_index-1)
-	else:
-		Day += 1 
-		current_contract +=1 
-		
+		starting_map_index = max(0, starting_map_index-1)		
 	n_uncleared_debris = 0 
 	load_cur_map(retry)
 	cleanedDebris = 0 
@@ -110,22 +130,18 @@ func _process(_delta: float) -> void:
 		if current_ent_grid.has_entity_at(ent_pos):
 			var ent = current_ent_grid.entities[ent_pos]
 			if ent.is_moving:
-				print("ent is still completeing animation")
 				return 
 	if ready_to_leave and !player.is_moving: 
 		ready_to_leave = false 
 		trigger_leave_scene()
 		
-		
-func check_if_all_mineral_on_platform() -> bool:
-	for key in current_map_node.ent_grid.entities:
-		var debris = current_map_node.ent_grid.entities[key] 
-		if debris as Debris:
-			if !current_map_node.elevator_platform.occupies(debris.grid_pos) and debris.mineral:
-				return false
-	return true
 	
-func take_turn() -> bool: 
+func take_turn() -> void : 
+	if training_mode:
+		if current_map.get_cell_source_id(player.grid_pos) == -1:
+			if starting_map_index < n_tutorials:	
+				load_cur_map(true)
+		return 
 	update_text(turn_timer.get_time_string())
 	var player_reached_elevator = current_map_node.elevator_platform.occupies(player.grid_pos)
 	if turn_timer.current_minutes == 5:
@@ -134,13 +150,11 @@ func take_turn() -> bool:
 			player.sunk = true 
 			died = true 
 			queue_ready_to_leave()
-			return false 
+		
 	if turn_timer.current_minutes == 0:
-		current_map_node.advance_lava(0.15)
+		current_map_node.advance_lava(0.15)	
 	turn_timer.advance_time()
 	
-	return false 
-
 func queue_ready_to_leave():
 	ready_to_leave = true 
 

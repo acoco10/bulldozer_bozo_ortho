@@ -10,6 +10,7 @@ enum results_state {Retry_Token_Used, Continue, Continue_Death, Reset_Death}
 @onready var new_life_menu = $CanvasLayer/new_life
 @onready var clone_thoughts = $CanvasLayer/clone_thoughts_scene
 
+
 #ENDING SCENES
 @onready var death_loss = $CanvasLayer/deaths_loss_scene
 @onready var mediocrity_loss = $CanvasLayer/mediocrity_loss_scene
@@ -24,6 +25,7 @@ var over: bool = false
 var base_citizen_number = 9995
 var too_mid_loss: bool = false 
 
+var music_player: AudioStreamPlayer
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey:
@@ -38,13 +40,20 @@ func _ready() -> void:
 	results.connect("Continue", _on_results_continue_control_flow)
 	results.connect("Retry", _on_results_retry_control_flow)
 	new_life_menu.connect("Continue", _on_new_life_continue)
+	dozerScene.connect("end_of_tutorial", _on_end_of_tutorial)
 	
 	
 	untrigger_new_life_scene()	
 	untrigger_results_scene()
 	untrigger_dozer_scene()
 
-
+func _on_end_of_tutorial():
+	if music_player == null:
+			music_player = AudioStreamPlayer.new()
+			add_child(music_player)
+			music_player.stream = preload("res://sounds/saturn-3-music-claire-de-lune-debussy-piano-411227.mp3")
+			music_player.play()
+				
 func _on_victory():
 	trigger_ending_scene("win")
 	
@@ -56,7 +65,8 @@ func _on_reset():
 	get_tree().reload_current_scene()
 	
 func _on_end_of_day(data: Dictionary) -> void: 
-	print("end of day recieved")	
+	print("end of day recieved")
+	
 	lost = data.died
 	if lost:
 		state_from_results = results_state.Reset_Death

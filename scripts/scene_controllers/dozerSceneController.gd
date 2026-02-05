@@ -5,10 +5,13 @@ extends Node2D
 @onready var time_ui: countdown_ui = $CanvasLayer/countdown_ui
 
 signal end_of_day(debris_harvested: int, debris_available: int, time_remaining_minutes: int, lost: bool)
+signal end_of_tutorial 
+
 const max_demerits = 2 
 
 func _ready() -> void:
 	gTrack.connect("player_finished", _on_day_finished)
+	gTrack.connect("end_of_tutorial", end_of_tutorial.emit)
 	
 func _on_day_finished():
 	time_ui.visible = false 
@@ -19,7 +22,8 @@ func _on_day_finished():
 	var days_rank = calc_rank()
 	var demerit_loss: bool
 	var too_mid: bool 
-	var all_puzzles = gTrack.map_index >= gTrack.maps.size() and !gTrack.died
+	var all_puzzles = gTrack.starting_map_index >= gTrack.maps.size() and !gTrack.died
+	
 	match days_rank:
 		"C":
 			gTrack.demerits +=1 

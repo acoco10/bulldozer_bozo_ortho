@@ -14,6 +14,8 @@ var scooped: bool = false
 @export var scoopable: bool
 @export var push_power: bool
 
+signal Broken_up 
+
 func _ready() -> void:
 	
 	super._ready()
@@ -26,12 +28,16 @@ func _ready() -> void:
 		unbroken_texture = load(unbroken_asset_path)
 		broken_up_texture = load(broken_asset_path)
 		sprite.texture = unbroken_texture
-	
+		if broken: 
+			set_broken_flags()
+			sprite.texture = broken_up_texture
 
 func set_free_after_move():
 	free_after_move = true 
 
 func set_broken_flags() -> void:
+	if !broken:
+		Broken_up.emit()
 	broken = true
 	pushable = true
 
