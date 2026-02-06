@@ -17,12 +17,15 @@ var moving_in_to_lava: bool = false
 var pushed_last_turn: bool = false 
 var reverse: bool = false 
 var sunk: bool = false 
+var turned: bool = false 
+var broke_tutorial_rule: bool = false 
 
 var arrow_hold_time: float = 0.0
 var held_direction: Facing
 var attempted_push_direction: Vector2i
 var action_cancelled: bool
-var tutorial: bool  = true 
+
+var map_data: Dictionary
 
 enum Facing { UP, DOWN, LEFT, RIGHT, NONE}
 
@@ -33,14 +36,12 @@ const PIANO_NOTES: Dictionary[Variant, Variant] = {
 	"F4": preload("res://sounds/448585__tedagame__f4.ogg"),
 	"G4": preload("res://sounds/448552__tedagame__g4.ogg"),
 	"A4": preload("res://sounds/448577__tedagame__a4.ogg"),
+	"C2":  preload("res://sounds/448541__tedagame__c2.ogg"), 
 }
 
 const NOTE_SEQUENCE = ["C4", "D4", "E4","F4", "G4", "A4"]
-const CHILL_NOTE_SEQUENCE = ["G4", "A4", "C4", "E4", "D4", "G4"]
 
 var note_index = 0
-
-
 
 @export var tracker: gameTracker
 @export var times_up: bool 
@@ -56,20 +57,27 @@ func _ready():
 	tracker.connect("new_map_instance", _on_new_map)
 	
 
+func play_wrong_note():
+	var player = AudioStreamPlayer.new()
+	add_child(player)
+	player.stream = PIANO_NOTES["C2"]
+	player.pitch_scale = .9  # Slight pitch variation
+	player.finished.connect(player.queue_free)
+	player.volume_db = -15
+	player.play()
+	
+	# Move to next note, wrap around
 func play_next_note():
 	var player = AudioStreamPlayer.new()
 	add_child(player)
-	player.stream = PIANO_NOTES[CHILL_NOTE_SEQUENCE[note_index]]
-	player.finished.connect(player.queue_free)
+	player.stream = PIANO_NOTES[NOTE_SEQUENCE[note_index]]
 	player.pitch_scale = .9  # Slight pitch variation
 	player.finished.connect(player.queue_free)
-	player.volume_db = -80
+	player.volume_db = -15
 	player.play()
-	var tween = create_tween()
-	tween.tween_property(player, "volume_db", -15, 0.01)
 	
 	# Move to next note, wrap around
-	note_index = (note_index + 1) % (PIANO_NOTES.size()-1)
+	note_index = (note_index + 1) % (NOTE_SEQUENCE.size())
 func sink():
 	sink_tween = create_tween()
 	backhoe.start_sinking()
@@ -85,13 +93,10 @@ func _on_player_finished():
 func _on_new_map(data: Dictionary):
 	backhoe.reset()
 	$bulldozer_sprite.reset()
-	
-	if data["map_index"] >7:
-		tutorial = false 
+	map_data = data 	
 	if sink_tween.is_valid():
 		sink_tween.kill()
 	print("player got new map")
-	print("map = %s", tracker.current_map.name)
 	ent_grid = tracker.current_ent_grid
 	global_position = data.player_pos as Vector2i  
 	grid_pos = ent_grid.land.local_to_map(global_position)
@@ -107,7 +112,7 @@ func _on_new_map(data: Dictionary):
 
 	update_animation(player_facing)
 
-func add_push_strain(delta):
+func add_push_strain():
 	var strain = sin(Time.get_ticks_msec() * 0.03) * 2.0
 	strain += randf_range(-1.5, 1.5)
 	rotation_degrees = strain
@@ -198,8 +203,9 @@ func _process(delta):
 		arrow_hold_time += delta  
 	else:
 		#no input this frame path, cancel action if there was input previously
-		if pushing || moving_in_to_lava:	
+		if pushing || moving_in_to_lava and arrow_hold_time !=0:	
 			update_visual_facing(previous_facing)
+			pass
 		arrow_hold_time = 0 
 		action_cancelled = true 
 		moving_in_to_lava = false 
@@ -207,9 +213,16 @@ func _process(delta):
 		held_direction = Facing.NONE
 		return 
 	
-	if arrow_hold_time > 0 and !pushing and !moving_in_to_lava: #standard case 1 frame no push
-		if tutorial:
+	if arrow_hold_time > 0 and !pushing and !moving_in_to_lava:
+		if map_data.reverse_only and !reverse and !turned and !backhoe.is_carrying():
+			broke_tutorial_rule = true
+			play_wrong_note()
+		if ent_grid.land.get_cell_source_id(grid_pos+ attempted_push_direction):
+			broke_tutorial_rule = true
+			play_wrong_note()	
+		elif map_data.tutorial:
 			play_next_note()
+		
 		print("player at standard no push or lava input")
 		pushed_last_turn = false 
 		process_input_result(attempted_push_direction, held_direction)
@@ -289,7 +302,7 @@ func _unhandled_input(event) -> void:
 		arrow_hold_time = 0 
 		update_visual_facing(held_direction)
 
-		if ent_grid.has_entity_at(grid_pos + attempted_push_direction) and arrow_hold_time < direction_hold_check_push:
+		if ent_grid.has_entity_at(grid_pos + attempted_push_direction) and arrow_hold_time < direction_hold_check_push || ent_grid.button.grid_pos == grid_pos + attempted_push_direction:
 			print("setting pushing flag")
 			pushing = true 
 			return 
@@ -303,17 +316,21 @@ func _unhandled_input(event) -> void:
 
 
 func update_visual_facing(now_facing:Facing):
+	
 	if now_facing == Facing.NONE:
 		print("blocking player facing getting set to none")
 		return	
 	previous_facing = player_facing
 	if now_facing == visual_facing:
 		reverse = false
+		turned = false
 	elif now_facing == get_opposite_facing(visual_facing):
 		reverse = true 
 	elif now_facing != visual_facing:
+		turned = true 
 		visual_facing = now_facing
 		reverse = false  # Turning cancels reverse
+
 	if reverse: 
 		player_facing = get_opposite_facing(visual_facing)
 	else:
@@ -335,6 +352,8 @@ func try_move(dir: Vector2i, now_facing:Facing) -> bool:
 	var target: Vector2i = grid_pos + dir
 	if resolve_movement(target, now_facing):
 		grid_pos = target
+		
+			
 		return true
 	trigger_push_fail(now_facing)
 	return false 
@@ -345,18 +364,19 @@ func reset_player_flags():
 	pushing = false 
 	moving_in_to_lava = false
 	pushed_last_turn  = false 
-	reverse = false 
+	reverse = false
+	broke_tutorial_rule = false 
 	
 
 func on_enter(retry: bool):
 	reset_player_flags()
 	if sink_tween.is_valid():
 		sink_tween.kill()
-	if !retry:
+	if retry:
+		canned_animation = false 
+	if !map_data.retry and !map_data.tutorial:
 		z_index = 4
 		enter_animation()
-	if retry:
-		ent_grid.flash(self)
 	$bulldozer_sprite.play()
 	$backhoeSprites.reset()
 

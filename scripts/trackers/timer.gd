@@ -20,10 +20,33 @@ func reset():
 	current_minutes = countdown_length
 
 func get_time_string() -> String:
-	@warning_ignore("integer_division")	
-	var hours = current_minutes / 60
-	var mins = current_minutes % 60
-	return "%d:%02d" % [hours, mins]
+	var coefficient: float
+	var exponent: int
+	
+	# Determine scientific notation based on time remaining
+	if current_minutes > 200:
+		coefficient = 1.0
+		exponent = -6
+	elif current_minutes > 150:
+		coefficient = 2.5
+		exponent = -6
+	elif current_minutes > 100:
+		coefficient = 5.0
+		exponent = -6
+	elif current_minutes > 50:
+		coefficient = 1.0
+		exponent = -5
+	elif current_minutes > 20:
+		coefficient = 5.0
+		exponent = -5
+	elif current_minutes > 10:
+		coefficient = 1.0
+		exponent = -4
+	else:  # < 10 minutes
+		coefficient = 5.0
+		exponent = -4
+    
+	return "Effusion Rate: %.1f×10⁻%d" % [coefficient, abs(exponent)]
 
 func is_finished() -> bool:
 	return current_minutes <= 0

@@ -89,7 +89,7 @@ func _on_results_continue_control_flow():
 			state_from_results = results_state.Continue_Death
 			_on_new_life_results()
 	elif over:
-		trigger_ending_scene("win")
+		_on_reset()	
 	else:
 		if too_mid_loss:
 			trigger_ending_scene("mid") 

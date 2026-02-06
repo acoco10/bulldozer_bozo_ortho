@@ -19,7 +19,8 @@ var turns: int = 2
 var elevator_countdown: int = -1
 
 var died: bool = false 
-var ready_to_leave: bool = false 
+var ready_to_leave: bool = false
+var trigger_retry_end_of_move: bool = false  
 
 #player over all state 
 var demerits: int = 0
@@ -54,28 +55,32 @@ func load_cur_map(retry: bool):
 	print("loading map: %d" %starting_map_index)
 	n_uncleared_debris = 0 
 	if current_map_node:
-		#flush last map data 
 		current_map_node.queue_free()
 	
 	current_map_node = maps[starting_map_index].instantiate()
 	get_parent().add_child(current_map_node)
 	current_ent_grid = current_map_node.ent_grid
 	current_map = current_map_node.get_node("tilemap").get_node("tiles")
+	
+	var reverse_only: bool = false	
+	if "reverse_only" in current_map_node:
+		reverse_only = current_map_node.reverse_only
 	var data: Dictionary[String, Variant] = {"player_pos":current_map_node.Player_start_pos.global_position, 
 											"facing":current_map_node.Player_start_pos.Direction, 
 											"retry": retry,
-											"map_index": starting_map_index}
+											"tutorial": starting_map_index< n_tutorials,
+											"reverse_only": reverse_only}
 	new_map_instance.emit(data)
 	current_fences_map = current_map_node.fences
 	configure_map_entities()	
 	current_map_node._enter_map_scene(retry)
-	best_turns = load_best_score(current_map_node.name)	
 	timeTracker.visible = true 
 	objective_ui.visible = false
 	turn_timer.set_countdown_length(current_map_node.timeLimitHours * 60 + current_map_node.timeLimitMinutes)
 	update_text(turn_timer.get_time_string())
 	if current_map_node.ent_grid.button != null: 
 		current_map_node.ent_grid.button.connect("button_press", elevator_called)
+	
 	if starting_map_index < n_tutorials:
 		training_mode = true
 		timeTracker.visible = false
@@ -84,10 +89,15 @@ func load_cur_map(retry: bool):
 		current_map_node.ent_grid.completion_flag.connect("button_press", next_objective)
 		if starting_map_index == 3:
 			$"../CanvasLayer/controls".set_control_text_reverse()
+		if starting_map_index == 8:
+			$"../CanvasLayer/controls".set_control_text_scoop()	
+		if starting_map_index == 9:
+			$"../CanvasLayer/controls".set_control_text_scoop_free_move()	
 	
-	else:
-		training_mode = false 
+	elif training_mode:
+		$"../CanvasLayer/controls".set_control_text_final()	
 		end_of_tutorial.emit()
+		training_mode = false 
 		
 	starting_map_index += 1 
 
@@ -97,7 +107,7 @@ func on_objective_completed():
 
 func next_objective():
 	if starting_map_index < n_tutorials:
-		load_cur_map(true)
+		load_cur_map(false)
 		objective_ui.next_objective()
 	else:
 		load_cur_map(false)
@@ -131,17 +141,20 @@ func _process(_delta: float) -> void:
 			var ent = current_ent_grid.entities[ent_pos]
 			if ent.is_moving:
 				return 
-	if ready_to_leave and !player.is_moving: 
+	if ready_to_leave: 
 		ready_to_leave = false 
 		trigger_leave_scene()
-		
+	if trigger_retry_end_of_move:
+		trigger_retry_end_of_move = false 
+		await get_tree().create_timer(0.2).timeout
+		load_cur_map(true)
 	
 func take_turn() -> void : 
 	if training_mode:
-		if current_map.get_cell_source_id(player.grid_pos) == -1:
-			if starting_map_index < n_tutorials:	
-				load_cur_map(true)
-		return 
+		if player.broke_tutorial_rule:
+			starting_map_index -=1 
+			trigger_retry_end_of_move = true 	
+			return 
 	update_text(turn_timer.get_time_string())
 	var player_reached_elevator = current_map_node.elevator_platform.occupies(player.grid_pos)
 	if turn_timer.current_minutes == 5:

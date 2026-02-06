@@ -30,15 +30,8 @@ func _on_day_finished():
 			if gTrack.demerits >= 2:
 				demerit_loss = true 
 				gTrack.reset_demerits()
-			gTrack.bs_in_a_row = 0 
-		"A":
-			if gTrack.retry_tokens < 3:
-				gTrack.retry_tokens +=1 
-			gTrack.bs_in_a_row = 0 
-		"B":
-			gTrack.bs_in_a_row += 1
-			if gTrack.bs_in_a_row == 3:
-				too_mid = true 
+			gTrack.bs_in_a_row = 0 	
+	
 		
 	end_of_day.emit({"debris_harvested": gTrack.cleanedDebris, 
 					"debris_available": gTrack.n_uncleared_debris, 

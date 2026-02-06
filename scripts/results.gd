@@ -6,7 +6,6 @@ signal Retry
 @onready var feed_back_text = $results_panel/MarginContainer/VBoxContainer/feedback_text
 @onready var rank = $results_panel/MarginContainer/VBoxContainer/rank
 @onready var demerit_sprites :Array = [$results_panel/MarginContainer/VBoxContainer/HBoxContainer/Demerit,  $results_panel/MarginContainer/VBoxContainer/HBoxContainer/Demerit2]
-@onready var retry_token_sprites: Array = [$results_panel/MarginContainer/VBoxContainer/HBoxContainer/RetryToken,  $results_panel/MarginContainer/VBoxContainer/HBoxContainer/RetryToken2, $results_panel/MarginContainer/VBoxContainer/HBoxContainer/RetryToken3]
 @onready var retry_token_button: Button = $results_panel/retry_button
 @onready var continue_button: Button = $results_panel/main_button
 @onready var buttons: Array[Button] = [continue_button, retry_token_button]
@@ -19,7 +18,7 @@ var rank_feedback = {
 	Demerit Recieved."
 }
 
-var demerit_msg = "Maximum demerits recieved. Thank you for your service Citizen #9243"
+var demerit_msg = "Maximum demerits recieved. ERR demerit system broken. No new gene code to print."
 
 var death_msg = "Citizen #9243 expired on mission"
 # Track if rank is currently cycling
@@ -29,7 +28,6 @@ var cycle_timer = 0.0
 var lost: bool 
 
 var demerits: int
-var retry_tokens: int 
 
 var new_token_flash: Tween
 const CYCLE_DURATION = 1.0  # 1 second
@@ -46,10 +44,9 @@ func on_continue():
 	Continue.emit()
 	
 func on_retry():
-	if new_token_flash.is_running():
+	if new_token_flash != null:
 		new_token_flash.kill()
 	Retry.emit() 
-	update_sprite_array(retry_token_sprites, retry_tokens -1, false)
 	
 func _process(delta: float) -> void:
 	if is_cycling:
@@ -70,15 +67,11 @@ func update_results(data: Dictionary, citizen_number_current: int):
 		lost = true 
 	
 	demerits = data["demerits"]
-	retry_tokens = data["retry_tokens"]
 	calculated_rank = data["rank"]
 	
 
 
-	if retry_tokens == 0:
-		retry_token_button.disabled = true 
-	else:
-		retry_token_button.disabled = false
+
 
 
 	if died:
@@ -121,12 +114,9 @@ func update_results(data: Dictionary, citizen_number_current: int):
 
 
 func update_citizen_number(citizen_number: int):
-	rank_feedback["A"] = "Excellent Work Citizen #%d! You have been awarded a retry token for your outstanding performance." % citizen_number
-	if retry_tokens == 3:
-		rank_feedback["A"] = "Excellent Work Citizen #%d! You already have the maximum number of retry tokens." % citizen_number
+	rank_feedback["A"] = "Excellent Work Citizen #%d!" % citizen_number
 	rank_feedback["B"] = "Acceptable Effort Citizen #%d." % citizen_number
 	rank_feedback["C"] = "Below Standards Citizen #%d. Demerit Recieved." % citizen_number
-	demerit_msg = "Maximum demerits recieved. Thank you for your service Citizen #%d." %citizen_number
 	death_msg  = "Citizen #%d expired on mission. We thank Citizen #%d for their service." %[citizen_number, citizen_number]
 
 func focus_button():
@@ -169,11 +159,9 @@ func reveal_rank():
 	if calculated_rank == "A":
 		print("A rank recieved")
 		update_sprite_array(demerit_sprites, demerits, false)
-		update_sprite_array(retry_token_sprites, retry_tokens, true)
 	elif calculated_rank == "C":
 		print("C rank recieved")
 		update_sprite_array(demerit_sprites, demerits, true)
-		update_sprite_array(retry_token_sprites, retry_tokens, false)
 
 func update_sprite_array(sprites: Array, max_revealed: int, new: bool):
 	for index in sprites.size():
